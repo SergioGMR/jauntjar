@@ -219,7 +219,7 @@ class BudgetResource extends Resource
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('insurance_price')
-                    ->label('Precio del seguro') // o 'Seguro'
+                    ->label('Precio del seguro')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('accommodation_stars')
