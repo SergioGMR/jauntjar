@@ -22,6 +22,8 @@ class Country extends Model
         'code',
         'currency',
         'pibpc',
+        'womens_rights',
+        'lgtb_rights',
         'visa',
         'language',
         'roaming'

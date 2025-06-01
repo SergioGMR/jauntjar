@@ -64,6 +64,20 @@ class CountryResource extends Resource
                     ->label('PIB per capita')
                     ->required()
                     ->integer(),
+                Forms\Components\TextInput::make('womens_rights')
+                    ->label('Derechos de las mujeres')
+                    ->required()
+                    ->numeric()
+                    ->default(0)
+                    ->minValue(0)
+                    ->maxValue(10),
+                Forms\Components\TextInput::make('lgtb_rights')
+                    ->label('Derechos de LGTBIQ+')
+                    ->required()
+                    ->numeric()
+                    ->default(0)
+                    ->minValue(0)
+                    ->maxValue(10),
                 Forms\Components\Select::make('visa')
                     ->options([
                         'No' => 'No',
@@ -109,6 +123,14 @@ class CountryResource extends Resource
                 Tables\Columns\TextColumn::make('pibpc')
                     ->label('PIB per capita')
                     ->suffix(' €')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('womens_rights')
+                    ->label('D. mujeres')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('lgtb_rights')
+                    ->label('D. LGTBIQ+')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('visa')
