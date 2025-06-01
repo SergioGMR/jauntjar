@@ -23,14 +23,16 @@
 
         <flux:navlist variant="outline">
             <flux:navlist.group :heading="__('Visitados')" class="grid" expandable>
-                <flux:navlist.item icon="list-bullet" :href="route('visitados.listado')" :current="request()->routeIs('visitados.listado')" wire:navigate>
+                <flux:navlist.item icon="list-bullet" :href="route('visitados.listado')"
+                    :current="request()->routeIs('visitados.listado')" wire:navigate>
                     {{ __('Listado') }}</flux:navlist.item>
             </flux:navlist.group>
         </flux:navlist>
 
         <flux:navlist variant="outline">
             <flux:navlist.group :heading="__('Planeados')" class="grid" expandable>
-                <flux:navlist.item icon="list-bullet" :href="route('planeados.listado')" :current="request()->routeIs('planeados.listado')" wire:navigate>
+                <flux:navlist.item icon="list-bullet" :href="route('planeados.listado')"
+                    :current="request()->routeIs('planeados.listado')" wire:navigate>
                     {{ __('Listado') }}</flux:navlist.item>
             </flux:navlist.group>
         </flux:navlist>
