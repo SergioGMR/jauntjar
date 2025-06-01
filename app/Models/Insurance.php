@@ -11,6 +11,7 @@ class Insurance extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'uuid',
         'name',
         'display',
         'slug',

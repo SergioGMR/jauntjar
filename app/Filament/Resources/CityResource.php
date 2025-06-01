@@ -42,6 +42,9 @@ class CityResource extends Resource
                     ->disabled()
                     ->dehydrated(true),
                 Forms\Components\Select::make('country_id')
+                    ->label('País')
+                    ->searchable()
+                    ->relationship('country', 'display')
                     ->options(fn() => Country::pluck('display', 'id'))
                     ->live()
                     ->afterStateUpdated(function (Set $set) {
@@ -49,16 +52,28 @@ class CityResource extends Resource
                     })
                     ->required(),
                 Forms\Components\TextInput::make('name')
+                    ->label('Nombre')
+                    ->live(onBlur: true)
+                    ->afterStateUpdated(function (Set $set, ?string $state) {
+                        $set('uuid', (string) Str::uuid());
+                        $set('display', Str::title($state));
+                        $set('slug', Str::slug($state));
+                    })
                     ->required(),
                 Forms\Components\TextInput::make('display')
+                    ->label('Nombre para mostrar')
                     ->required(),
                 Forms\Components\TextInput::make('slug')
                     ->required(),
-                Forms\Components\Toggle::make('visited'),
-                Forms\Components\DatePicker::make('visited_at'),
+                Forms\Components\Toggle::make('visited')
+                    ->label('Visitado'),
+                Forms\Components\DatePicker::make('visited_at')
+                    ->label('Fecha de visita'),
                 Forms\Components\TextInput::make('days')
+                    ->label('Días')
                     ->numeric(),
                 Forms\Components\TextInput::make('stops')
+                    ->label('Escalas')
                     ->numeric(),
                 Forms\Components\Grid::make()
                     ->schema([

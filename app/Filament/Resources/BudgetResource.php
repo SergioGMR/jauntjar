@@ -3,17 +3,18 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\BudgetResource\Pages;
-use App\Filament\Resources\BudgetResource\RelationManagers;
 use App\Models\Budget;
+use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
-use Filament\Forms;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
 
 class BudgetResource extends Resource
 {
@@ -36,64 +37,156 @@ class BudgetResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Select::make('city_id')
+                    ->label('Ciudad')
+                    ->searchable()
                     ->relationship('city', 'display')
                     ->required(),
                 Forms\Components\Select::make('airline_id')
+                    ->label('Aerolínea')
+                    ->searchable()
                     ->relationship('airline', 'display')
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('uuid')
+                            ->label('UUID')
+                            ->required()
+                            ->disabled()
+                            ->dehydrated(true),
+                        Forms\Components\TextInput::make('name')
+                            ->label('Nombre')
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(function (Set $set, ?string $state) {
+                                $set('uuid', (string) Str::uuid());
+                                $set('display', Str::title($state));
+                                $set('slug', Str::slug($state));
+                            })
+                            ->required(),
+                        Forms\Components\TextInput::make('display')
+                            ->label('Nombre para mostrar')
+                            ->required(),
+                        Forms\Components\TextInput::make('slug')
+                            ->label('Slug')
+                            ->required(),
+                        Forms\Components\FileUpload::make('logo')
+                            ->required()
+                            ->columnSpanFull(),
+                        Forms\Components\Toggle::make('is_low_cost')
+                            ->label('Bajo costo')
+                            ->helperText('¿Es una aerolínea de bajo costo?')
+                            ->default(false)
+                            ->required(),
+                    ])
+                    ->maxWidth('xl')
                     ->required(),
                 Forms\Components\Select::make('insurance_id')
-                    ->relationship('insurance', 'display'),
+                    ->label('Seguro')
+                    ->searchable()
+                    ->relationship('insurance', 'display')
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('uuid')
+                            ->label('UUID')
+                            ->required()
+                            ->disabled()
+                            ->dehydrated(true),
+                        Forms\Components\TextInput::make('name')
+                            ->label('Nombre')
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(function (Set $set, ?string $state) {
+                                $set('uuid', (string) Str::uuid());
+                                $set('display', Str::title($state));
+                                $set('slug', Str::slug($state));
+                            })
+                            ->required(),
+                        Forms\Components\TextInput::make('display')
+                            ->label('Nombre para mostrar')
+                            ->required(),
+                        Forms\Components\TextInput::make('slug')
+                            ->required(),
+                        Forms\Components\TextInput::make('url')
+                            ->required(),
+                    ]),
                 Forms\Components\TextInput::make('name')
+                    ->label('Nombre')
+                    ->live(onBlur: true)
+                    ->afterStateUpdated(function (Set $set, ?string $state) {
+                        $set('uuid', (string) Str::uuid());
+                        $set('display', Str::title($state));
+                        $set('slug', Str::slug($state));
+                    })
                     ->required(),
                 Forms\Components\TextInput::make('display')
+                    ->label('Nombre para mostrar')
                     ->required(),
                 Forms\Components\TextInput::make('slug')
                     ->required(),
-                Forms\Components\DatePicker::make('departed_at'),
-                Forms\Components\DatePicker::make('arrived_at'),
+                Forms\Components\DatePicker::make('departed_at')
+                    ->label('Fecha de salida'),
+                Forms\Components\DatePicker::make('arrived_at')
+                    ->label('Fecha de vuelta'),
                 Forms\Components\TextInput::make('flight_ticket_price')
                     ->hint('grupo')
+                    ->label('Precio del billete')
                     ->required()
                     ->live()
+                    ->debounce(500)
                     ->afterStateUpdated(function (Get $get, Set $set, ?int $old, ?int $state) {
-                        $total = $get('flight_ticket_price') + $get('insurance_price') + $get('accommodation_price') + $get('transport_price');
+                        $total = (int)($get('flight_ticket_price') ?? 0)
+                            + (int)($get('insurance_price') ?? 0)
+                            + (int)($get('accommodation_price') ?? 0)
+                            + (int)($get('transport_price') ?? 0);
 
                         $set('total_price', $total);
                     })
                     ->numeric(),
                 Forms\Components\TextInput::make('insurance_price')
+                    ->label('Precio del seguro')
                     ->required()
                     ->live()
                     ->afterStateUpdated(function (Get $get, Set $set, ?int $old, ?int $state) {
-                        $total = $get('flight_ticket_price') + $get('insurance_price') + $get('accommodation_price') + $get('transport_price');
+                        $total = (int)($get('flight_ticket_price') ?? 0)
+                            + (int)($get('insurance_price') ?? 0)
+                            + (int)($get('accommodation_price') ?? 0)
+                            + (int)($get('transport_price') ?? 0);
 
                         $set('total_price', $total);
                     })
                     ->numeric(),
                 Forms\Components\TextInput::make('accommodation_stars')
+                    ->label('Estrellas del alojamiento')
                     ->required()
                     ->numeric(),
                 Forms\Components\TextInput::make('accommodation_price')
+                    ->label('Precio del alojamiento')
                     ->required()
                     ->live()
+                    ->debounce(500)
                     ->afterStateUpdated(function (Get $get, Set $set, ?int $old, ?int $state) {
-                        $total = $get('flight_ticket_price') + $get('insurance_price') + $get('accommodation_price') + $get('transport_price');
+                        $total = (int)($get('flight_ticket_price') ?? 0)
+                            + (int)($get('insurance_price') ?? 0)
+                            + (int)($get('accommodation_price') ?? 0)
+                            + (int)($get('transport_price') ?? 0);
 
                         $set('total_price', $total);
                     })
                     ->numeric(),
                 Forms\Components\TextInput::make('transport_type')
+                    ->label('Tipo de transporte')
                     ->required(),
                 Forms\Components\TextInput::make('transport_price')
+                    ->label('Precio del transporte')
                     ->required()
                     ->live()
+                    ->debounce(500)
                     ->afterStateUpdated(function (Get $get, Set $set, ?int $old, ?int $state) {
-                        $total = $get('flight_ticket_price') + $get('insurance_price') + $get('accommodation_price') + $get('transport_price');
+                        $total = (int)($get('flight_ticket_price') ?? 0)
+                            + (int)($get('insurance_price') ?? 0)
+                            + (int)($get('accommodation_price') ?? 0)
+                            + (int)($get('transport_price') ?? 0);
 
                         $set('total_price', $total);
                     })
                     ->numeric(),
                 Forms\Components\TextInput::make('total_price')
+                    ->label('Precio total')
                     ->numeric()
                     ->live(),
             ]);
@@ -126,6 +219,7 @@ class BudgetResource extends Resource
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('insurance_price')
+                    ->label('Precio del seguro') // o 'Seguro'
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('accommodation_stars')

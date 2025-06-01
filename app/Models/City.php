@@ -28,7 +28,8 @@ class City extends Model
     public $casts = [
         'visited' => 'boolean',
         'visited_at' => 'datetime',
-        'coordinates' => 'array',
+        'coordinates' =>
+        'array',
     ];
     public function country(): BelongsTo
     {

@@ -41,6 +41,7 @@ class CountryResource extends Resource
                     ->disabled()
                     ->dehydrated(true),
                 Forms\Components\TextInput::make('name')
+                    ->label('Nombre')
                     ->live(onBlur: true)
                     ->afterStateUpdated(function (Set $set, ?string $state) {
                         $set('uuid', (string) Str::uuid());

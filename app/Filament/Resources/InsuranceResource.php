@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\InsuranceResource\Pages;
-use App\Filament\Resources\InsuranceResource\RelationManagers;
 use App\Models\Insurance;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -12,6 +11,8 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Str;
+use Filament\Forms\Set;
 
 class InsuranceResource extends Resource
 {
@@ -25,10 +26,20 @@ class InsuranceResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('uuid')
                     ->label('UUID')
-                    ->required(),
+                    ->required()
+                    ->disabled()
+                    ->dehydrated(true),
                 Forms\Components\TextInput::make('name')
+                    ->label('Nombre')
+                    ->live(onBlur: true)
+                    ->afterStateUpdated(function (Set $set, ?string $state) {
+                        $set('uuid', (string) Str::uuid());
+                        $set('display', Str::title($state));
+                        $set('slug', Str::slug($state));
+                    })
                     ->required(),
                 Forms\Components\TextInput::make('display')
+                    ->label('Nombre para mostrar')
                     ->required(),
                 Forms\Components\TextInput::make('slug')
                     ->required(),

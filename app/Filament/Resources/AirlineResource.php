@@ -6,12 +6,20 @@ use App\Filament\Resources\AirlineResource\Pages;
 use App\Filament\Resources\AirlineResource\RelationManagers;
 use App\Models\Airline;
 use Filament\Forms;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Forms\Set;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Str;
 
 class AirlineResource extends Resource
 {
@@ -25,17 +33,31 @@ class AirlineResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('uuid')
                     ->label('UUID')
-                    ->required(),
+                    ->required()
+                    ->disabled()
+                    ->dehydrated(true),
                 Forms\Components\TextInput::make('name')
+                    ->label('Nombre')
+                    ->live(onBlur: true)
+                    ->afterStateUpdated(function (Set $set, ?string $state) {
+                        $set('uuid', (string) Str::uuid());
+                        $set('display', Str::title($state));
+                        $set('slug', Str::slug($state));
+                    })
                     ->required(),
                 Forms\Components\TextInput::make('display')
+                    ->label('Nombre para mostrar')
                     ->required(),
                 Forms\Components\TextInput::make('slug')
+                    ->label('Slug')
                     ->required(),
                 Forms\Components\FileUpload::make('logo')
                     ->required()
                     ->columnSpanFull(),
                 Forms\Components\Toggle::make('is_low_cost')
+                    ->label('Bajo costo')
+                    ->helperText('¿Es una aerolínea de bajo costo?')
+                    ->default(false)
                     ->required(),
             ]);
     }
