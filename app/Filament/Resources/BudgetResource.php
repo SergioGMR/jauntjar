@@ -13,7 +13,6 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 
 class BudgetResource extends Resource
@@ -36,11 +35,7 @@ class BudgetResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('city_id')
-                    ->label('Ciudad')
-                    ->searchable()
-                    ->relationship('city', 'display')
-                    ->required(),
+
                 Forms\Components\Select::make('airline_id')
                     ->label('Aerolínea')
                     ->searchable()
@@ -129,10 +124,10 @@ class BudgetResource extends Resource
                     ->live()
                     ->debounce(500)
                     ->afterStateUpdated(function (Get $get, Set $set, ?int $old, ?int $state) {
-                        $total = (int)($get('flight_ticket_price') ?? 0)
-                            + (int)($get('insurance_price') ?? 0)
-                            + (int)($get('accommodation_price') ?? 0)
-                            + (int)($get('transport_price') ?? 0);
+                        $total = (int) ($get('flight_ticket_price') ?? 0)
+                            + (int) ($get('insurance_price') ?? 0)
+                            + (int) ($get('accommodation_price') ?? 0)
+                            + (int) ($get('transport_price') ?? 0);
 
                         $set('total_price', $total);
                     })
@@ -142,45 +137,10 @@ class BudgetResource extends Resource
                     ->required()
                     ->live()
                     ->afterStateUpdated(function (Get $get, Set $set, ?int $old, ?int $state) {
-                        $total = (int)($get('flight_ticket_price') ?? 0)
-                            + (int)($get('insurance_price') ?? 0)
-                            + (int)($get('accommodation_price') ?? 0)
-                            + (int)($get('transport_price') ?? 0);
-
-                        $set('total_price', $total);
-                    })
-                    ->numeric(),
-                Forms\Components\TextInput::make('accommodation_stars')
-                    ->label('Estrellas del alojamiento')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('accommodation_price')
-                    ->label('Precio del alojamiento')
-                    ->required()
-                    ->live()
-                    ->debounce(500)
-                    ->afterStateUpdated(function (Get $get, Set $set, ?int $old, ?int $state) {
-                        $total = (int)($get('flight_ticket_price') ?? 0)
-                            + (int)($get('insurance_price') ?? 0)
-                            + (int)($get('accommodation_price') ?? 0)
-                            + (int)($get('transport_price') ?? 0);
-
-                        $set('total_price', $total);
-                    })
-                    ->numeric(),
-                Forms\Components\TextInput::make('transport_type')
-                    ->label('Tipo de transporte')
-                    ->required(),
-                Forms\Components\TextInput::make('transport_price')
-                    ->label('Precio del transporte')
-                    ->required()
-                    ->live()
-                    ->debounce(500)
-                    ->afterStateUpdated(function (Get $get, Set $set, ?int $old, ?int $state) {
-                        $total = (int)($get('flight_ticket_price') ?? 0)
-                            + (int)($get('insurance_price') ?? 0)
-                            + (int)($get('accommodation_price') ?? 0)
-                            + (int)($get('transport_price') ?? 0);
+                        $total = (int) ($get('flight_ticket_price') ?? 0)
+                            + (int) ($get('insurance_price') ?? 0)
+                            + (int) ($get('accommodation_price') ?? 0)
+                            + (int) ($get('transport_price') ?? 0);
 
                         $set('total_price', $total);
                     })

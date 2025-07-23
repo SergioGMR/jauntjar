@@ -3,15 +3,14 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CityResource\Pages;
-use App\Filament\Resources\CityResource\RelationManagers;
 use App\Models\City;
 use App\Models\Country;
+use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Set;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
-use Filament\Forms;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
@@ -45,7 +44,7 @@ class CityResource extends Resource
                     ->label('País')
                     ->searchable()
                     ->relationship('country', 'display')
-                    ->options(fn() => Country::pluck('display', 'id'))
+                    ->options(fn () => Country::pluck('display', 'id'))
                     ->live()
                     ->afterStateUpdated(function (Set $set) {
                         $set('uuid', (string) Str::uuid());
@@ -67,11 +66,6 @@ class CityResource extends Resource
                     ->required(),
                 Forms\Components\Toggle::make('visited')
                     ->label('Visitado'),
-                Forms\Components\DatePicker::make('visited_at')
-                    ->label('Fecha de visita'),
-                Forms\Components\TextInput::make('days')
-                    ->label('Días')
-                    ->numeric(),
                 Forms\Components\TextInput::make('stops')
                     ->label('Escalas')
                     ->numeric(),

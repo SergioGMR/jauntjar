@@ -2,9 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
-
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Airline extends Model
 {
@@ -14,7 +13,7 @@ class Airline extends Model
         'uuid',
         'name',
         'display',
-        'slug', 
+        'slug',
         'logo',
         'is_low_cost',
     ];
