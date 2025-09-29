@@ -2,6 +2,6 @@
     <div
          class="relative h-full flex-1 overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
         <x-maps-google :mapType="$mapType" :zoomLevel="$zoomLevel" :centerPoint="$centerPoint"
-                       :centerToBoundsCenter="$centerToBoundsCenter" {{-- :markers="$markers"  --}} />
+                       :markers="$markers" :centerToBoundsCenter="$centerToBoundsCenter" />
     </div>
 </div>

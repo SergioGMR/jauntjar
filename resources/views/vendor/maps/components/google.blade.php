@@ -1,3 +1,28 @@
+@php
+    $markerPayload = collect($markers ?? [])->map(function ($marker) {
+        $lat = $marker['lat'] ?? $marker[0] ?? null;
+        $lng = $marker['long'] ?? $marker[1] ?? null;
+
+        if ($lat === null || $lng === null) {
+            return null;
+        }
+
+        return [
+            'position' => [
+                'lat' => $lat,
+                'lng' => $lng,
+            ],
+            'title' => $marker['title'] ?? 'Marcador',
+            'info' => $marker['info'] ?? null,
+        ];
+    })->filter()->values();
+
+    $mapCenter = [
+        'lat' => $centerPoint['lat'] ?? $centerPoint[0] ?? 0,
+        'lng' => $centerPoint['long'] ?? $centerPoint[1] ?? 0,
+    ];
+@endphp
+
 <div class="h-full w-full" id="{{ $mapId }}"></div>
 
 <!-- prettier-ignore -->
@@ -28,8 +53,8 @@ r.add(f) && u().then(() => d[l](f, ...n))
 <script>
     async function initMap{{ $mapId }}() {
         if (typeof google === "undefined" || typeof google.maps ===
-            "undefined") {
-            console.error("Google Maps API no está cargada correctamente");
+            "undefined" || typeof google.maps.importLibrary !== "function") {
+            requestAnimationFrame(initMap{{ $mapId }});
             return;
         }
 
@@ -43,72 +68,97 @@ r.add(f) && u().then(() => d[l](f, ...n))
             Map,
             InfoWindow
         } = await google.maps.importLibrary("maps");
+        const markerLibrary = await google.maps.importLibrary("marker").catch(() => ({}));
         const {
             AdvancedMarkerElement,
             PinElement
-        } = await google.maps.importLibrary("marker");
+        } = markerLibrary;
+
+        const hasAdvancedMarkers = typeof AdvancedMarkerElement === "function";
+
+        const centerPoint = @json($mapCenter);
+        const markers = @json($markerPayload);
+        const shouldFitBounds = @json($fitToBounds);
+        const shouldCenterToBounds = @json($centerToBoundsCenter);
 
         const map = new Map(document.getElementById(
             "{{ $mapId }}"), {
-            center: {
-                lat: {{ $centerPoint["lat"] ?? $centerPoint[0] }},
-                lng: {{ $centerPoint["long"] ?? $centerPoint[1] }}
-            },
+            center: centerPoint,
             zoom: {{ $zoomLevel }},
             mapTypeId: "{{ $mapType }}",
             mapId: "{{ $mapId }}"
         });
 
-        @if ($fitToBounds || $centerToBoundsCenter)
-            let bounds = new google.maps.LatLngBounds();
-        @endif
+        let bounds = null;
+        if (shouldFitBounds || shouldCenterToBounds) {
+            bounds = new google.maps.LatLngBounds();
+        }
 
-        @foreach ($markers as $index => $marker)
-            const markerContent{{ $index }} = buildContent({
-                title: "{{ $marker["title"] ?? "Marcador" }}"
-            });
+        markers.forEach((markerData) => {
+            const position = new google.maps.LatLng(
+                Number(markerData.position.lat ?? markerData.position.lat),
+                Number(markerData.position.lng ?? markerData.position.lng)
+            );
+            const markerMeta = {
+                title: markerData.title ?? 'Marcador',
+                info: markerData.info ?? '',
+            };
 
-            const pinEmoji{{ $index }} = new PinElement({
-                glyph: "👍🏻",
-                scale: 1.2,
-                background: "green",
-                borderColor: "black",
-                glyphColor: "white",
-            })
+            const markerContent = buildContent(markerMeta);
 
-            const marker{{ $index }} = new AdvancedMarkerElement({
-                position: {
-                    lat: {{ $marker["lat"] ?? $marker[0] }},
-                    lng: {{ $marker["long"] ?? $marker[1] }}
-                },
-                map: map,
-                gmpClickable: true,
-                content: pinEmoji{{ $index }}.element
-            });
-
-            @if (isset($marker["info"]))
-                const infoWindow{{ $index }} = new InfoWindow({
-                    content: markerContent{{ $index }}
+            const marker = hasAdvancedMarkers
+                ? new AdvancedMarkerElement({
+                    position,
+                    map: map,
+                    gmpClickable: true,
+                    content: typeof PinElement === 'function'
+                        ? new PinElement({
+                            glyph: '👍🏻',
+                            scale: 1.2,
+                            background: 'green',
+                            borderColor: 'black',
+                            glyphColor: 'white'
+                        }).element
+                        : createFallbackMarkerElement(markerMeta),
+                    title: markerMeta.title
+                })
+                : new google.maps.Marker({
+                    position,
+                    map: map,
+                    title: markerMeta.title
                 });
-                marker{{ $index }}.addListener("gmp-click",
-                    function() {
-                        infoWindow{{ $index }}.open(map,
-                            marker{{ $index }});
+
+            if (markerData.info) {
+                const infoWindow = new InfoWindow({
+                    content: markerContent
+                });
+
+                const clickEvent = hasAdvancedMarkers ? 'gmp-click' : 'click';
+                marker.addListener(clickEvent, () => {
+                    infoWindow.open({
+                        anchor: marker,
+                        map: map
                     });
-            @endif
+                });
+            }
 
-            @if ($fitToBounds || $centerToBoundsCenter)
-                bounds.extend(marker{{ $index }}.position);
-            @endif
-        @endforeach
+            if (bounds) {
+                bounds.extend(position);
+            }
+        });
 
-        @if ($fitToBounds)
+        if (bounds && markers.length === 0) {
+            bounds.extend(centerPoint);
+        }
+
+        if (bounds && shouldFitBounds && !bounds.isEmpty()) {
             map.fitBounds(bounds);
-        @endif
+        }
 
-        @if ($centerToBoundsCenter)
+        if (bounds && shouldCenterToBounds && !bounds.isEmpty()) {
             map.setCenter(bounds.getCenter());
-        @endif
+        }
+
     }
 
     function buildContent(place) {
@@ -117,14 +167,18 @@ r.add(f) && u().then(() => d[l](f, ...n))
             "flex flex-col items-center bg-emerald-400 p-3 rounded-lg shadow-lg text-sm font-bold cursor-pointer";
         content.innerHTML = `
             <div class="text-lg">${place.title}</div>
-            <div class="text-xs text-gray-700">${place.info}</div>
+            <div class="text-xs text-gray-700">${place.info ?? ""}</div>
         `;
         return content;
     }
 
-    if (typeof google !== "undefined" && typeof google.maps !== "undefined") {
-        initMap{{ $mapId }}();
-    } else {
-        console.error("Google Maps API no cargó correctamente");
+    function createFallbackMarkerElement(place) {
+        const element = document.createElement("div");
+        element.className =
+            "grid place-items-center rounded-full bg-emerald-500 p-2 text-white shadow-lg";
+        element.textContent = place.title?.charAt(0) ?? "•";
+        return element;
     }
+
+    queueMicrotask(initMap{{ $mapId }});
 </script>
