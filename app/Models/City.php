@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class City extends Model
@@ -25,14 +26,20 @@ class City extends Model
         'visited_at',
         'coordinates',
     ];
+
     public $casts = [
         'visited' => 'boolean',
         'visited_at' => 'datetime',
-        'coordinates' =>
-        'array',
+        'coordinates' => 'array',
     ];
+
     public function country(): BelongsTo
     {
         return $this->belongsTo(Country::class);
+    }
+
+    public function classification(): HasOne
+    {
+        return $this->hasOne(Classification::class);
     }
 }

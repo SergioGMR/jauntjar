@@ -2,15 +2,14 @@
 
 namespace App\Livewire;
 
-use Livewire\Component;
 use App\Models\City as Ciudad;
 use App\Models\Country;
+use Livewire\Component;
 use Livewire\WithPagination;
 
 class PlaneadosListado extends Component
 {
     use WithPagination;
-
 
     public function render()
     {
