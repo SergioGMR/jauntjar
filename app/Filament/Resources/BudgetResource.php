@@ -2,12 +2,28 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\DatePicker;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use App\Filament\Resources\BudgetResource\Pages\ManageBudgets;
 use App\Filament\Resources\BudgetResource\Pages;
 use App\Models\Budget;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -23,30 +39,30 @@ class BudgetResource extends Resource
 
     protected static ?string $pluralModelLabel = 'presupuestos';
 
-    protected static ?string $navigationIcon = 'heroicon-o-wallet';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-wallet';
 
-    protected static ?string $activeNavigationIcon = 'heroicon-s-wallet';
+    protected static string | \BackedEnum | null $activeNavigationIcon = 'heroicon-s-wallet';
 
     protected static ?string $navigationLabel = 'Presupuestos';
 
     protected static ?int $navigationSort = 3;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
 
-                Forms\Components\Select::make('airline_id')
+                Select::make('airline_id')
                     ->label('Aerolínea')
                     ->searchable()
                     ->relationship('airline', 'display')
                     ->createOptionForm([
-                        Forms\Components\TextInput::make('uuid')
+                        TextInput::make('uuid')
                             ->label('UUID')
                             ->required()
                             ->disabled()
                             ->dehydrated(true),
-                        Forms\Components\TextInput::make('name')
+                        TextInput::make('name')
                             ->label('Nombre')
                             ->live(onBlur: true)
                             ->afterStateUpdated(function (Set $set, ?string $state) {
@@ -55,16 +71,16 @@ class BudgetResource extends Resource
                                 $set('slug', Str::slug($state));
                             })
                             ->required(),
-                        Forms\Components\TextInput::make('display')
+                        TextInput::make('display')
                             ->label('Nombre para mostrar')
                             ->required(),
-                        Forms\Components\TextInput::make('slug')
+                        TextInput::make('slug')
                             ->label('Slug')
                             ->required(),
-                        Forms\Components\FileUpload::make('logo')
+                        FileUpload::make('logo')
                             ->required()
                             ->columnSpanFull(),
-                        Forms\Components\Toggle::make('is_low_cost')
+                        Toggle::make('is_low_cost')
                             ->label('Bajo costo')
                             ->helperText('¿Es una aerolínea de bajo costo?')
                             ->default(false)
@@ -72,17 +88,17 @@ class BudgetResource extends Resource
                     ])
                     ->maxWidth('xl')
                     ->required(),
-                Forms\Components\Select::make('insurance_id')
+                Select::make('insurance_id')
                     ->label('Seguro')
                     ->searchable()
                     ->relationship('insurance', 'display')
                     ->createOptionForm([
-                        Forms\Components\TextInput::make('uuid')
+                        TextInput::make('uuid')
                             ->label('UUID')
                             ->required()
                             ->disabled()
                             ->dehydrated(true),
-                        Forms\Components\TextInput::make('name')
+                        TextInput::make('name')
                             ->label('Nombre')
                             ->live(onBlur: true)
                             ->afterStateUpdated(function (Set $set, ?string $state) {
@@ -91,15 +107,15 @@ class BudgetResource extends Resource
                                 $set('slug', Str::slug($state));
                             })
                             ->required(),
-                        Forms\Components\TextInput::make('display')
+                        TextInput::make('display')
                             ->label('Nombre para mostrar')
                             ->required(),
-                        Forms\Components\TextInput::make('slug')
+                        TextInput::make('slug')
                             ->required(),
-                        Forms\Components\TextInput::make('url')
+                        TextInput::make('url')
                             ->required(),
                     ]),
-                Forms\Components\TextInput::make('name')
+                TextInput::make('name')
                     ->label('Nombre')
                     ->live(onBlur: true)
                     ->afterStateUpdated(function (Set $set, ?string $state) {
@@ -108,16 +124,16 @@ class BudgetResource extends Resource
                         $set('slug', Str::slug($state));
                     })
                     ->required(),
-                Forms\Components\TextInput::make('display')
+                TextInput::make('display')
                     ->label('Nombre para mostrar')
                     ->required(),
-                Forms\Components\TextInput::make('slug')
+                TextInput::make('slug')
                     ->required(),
-                Forms\Components\DatePicker::make('departed_at')
+                DatePicker::make('departed_at')
                     ->label('Fecha de salida'),
-                Forms\Components\DatePicker::make('arrived_at')
+                DatePicker::make('arrived_at')
                     ->label('Fecha de vuelta'),
-                Forms\Components\TextInput::make('flight_ticket_price')
+                TextInput::make('flight_ticket_price')
                     ->hint('grupo')
                     ->label('Precio del billete')
                     ->required()
@@ -132,7 +148,7 @@ class BudgetResource extends Resource
                         $set('total_price', $total);
                     })
                     ->numeric(),
-                Forms\Components\TextInput::make('insurance_price')
+                TextInput::make('insurance_price')
                     ->label('Precio del seguro')
                     ->required()
                     ->live()
@@ -145,7 +161,7 @@ class BudgetResource extends Resource
                         $set('total_price', $total);
                     })
                     ->numeric(),
-                Forms\Components\TextInput::make('total_price')
+                TextInput::make('total_price')
                     ->label('Precio total')
                     ->numeric()
                     ->live(),
@@ -156,73 +172,73 @@ class BudgetResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('city.display')
+                TextColumn::make('city.display')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('airline.display')
+                TextColumn::make('airline.display')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('insurance.display')
+                TextColumn::make('insurance.display')
                     ->default('N/A')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('display')
+                TextColumn::make('display')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('slug')
+                TextColumn::make('slug')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('departed_at')
+                TextColumn::make('departed_at')
                     ->date('d/m/Y')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('arrived_at')
+                TextColumn::make('arrived_at')
                     ->date('d/m/Y')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('flight_ticket_price')
+                TextColumn::make('flight_ticket_price')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('insurance_price')
+                TextColumn::make('insurance_price')
                     ->label('Precio del seguro')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('accommodation_stars')
+                TextColumn::make('accommodation_stars')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('accommodation_price')
+                TextColumn::make('accommodation_price')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('transport_type')
+                TextColumn::make('transport_type')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('transport_price')
+                TextColumn::make('transport_price')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('total_price')
+                TextColumn::make('total_price')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
+                TrashedFilter::make(),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-                Tables\Actions\ForceDeleteAction::make(),
-                Tables\Actions\RestoreAction::make(),
+            ->recordActions([
+                EditAction::make(),
+                DeleteAction::make(),
+                ForceDeleteAction::make(),
+                RestoreAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
                 ]),
             ]);
     }
@@ -230,7 +246,7 @@ class BudgetResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ManageBudgets::route('/'),
+            'index' => ManageBudgets::route('/'),
         ];
     }
 
