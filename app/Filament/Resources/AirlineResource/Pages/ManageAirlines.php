@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\AirlineResource\Pages;
 
+use Filament\Actions\CreateAction;
 use App\Filament\Resources\AirlineResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ManageRecords;
@@ -13,7 +14,7 @@ class ManageAirlines extends ManageRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

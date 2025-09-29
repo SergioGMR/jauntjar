@@ -24,7 +24,7 @@
 
         <flux:navbar class="mr-1.5 space-x-0.5 py-0!">
             <flux:tooltip :content="__('Search')" position="bottom">
-                <flux:navbar.item class="!h-10 [&>div>svg]:size-5" icon="magnifying-glass" href="#"
+                <flux:navbar.item class="h-10! [&>div>svg]:size-5" icon="magnifying-glass" href="#"
                     :label="__('Search')" />
             </flux:tooltip>
             <flux:tooltip :content="__('Repository')" position="bottom">
