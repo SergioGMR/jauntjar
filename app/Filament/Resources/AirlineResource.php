@@ -7,11 +7,11 @@ use App\Models\Airline;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
 use Filament\Schemas\Schema;
-use Filament\Tables\Actions;
 use Filament\Actions\EditAction;
 use Filament\Resources\Resource;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\RestoreAction;
+use Filament\Support\Icons\Heroicon;
 use Filament\Actions\BulkActionGroup;
 use Filament\Forms\Components\Toggle;
 use Filament\Actions\DeleteBulkAction;
@@ -28,7 +28,6 @@ use Filament\Schemas\Components\Utilities\Set;
 use App\Filament\Resources\AirlineResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\AirlineResource\Pages\ManageAirlines;
-use Filament\Support\Icons\Heroicon;
 
 class AirlineResource extends Resource
 {
@@ -111,6 +110,7 @@ class AirlineResource extends Resource
             ])
             ->filters([
                 TrashedFilter::make(),
+                TrashedFilter::make(),
             ])
             ->recordActions([
                 EditAction::make()
@@ -142,7 +142,7 @@ class AirlineResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ManageAirlines::route('/'),
+            'index' => ManageAirlines::route('/'),
         ];
     }
 

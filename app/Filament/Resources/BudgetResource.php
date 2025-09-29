@@ -226,6 +226,7 @@ class BudgetResource extends Resource
             ])
             ->filters([
                 TrashedFilter::make(),
+                TrashedFilter::make(),
             ])
             ->recordActions([
                 EditAction::make()
@@ -257,7 +258,7 @@ class BudgetResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ManageBudgets::route('/'),
+            'index' => ManageBudgets::route('/'),
         ];
     }
 

@@ -156,6 +156,7 @@ class CityResource extends Resource
             ])
             ->filters([
                 TrashedFilter::make(),
+                TrashedFilter::make(),
             ])
             ->recordActions([
                 EditAction::make()
@@ -187,7 +188,7 @@ class CityResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ManageCities::route('/'),
+            'index' => ManageCities::route('/'),
         ];
     }
 

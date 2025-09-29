@@ -102,6 +102,7 @@ class InsuranceResource extends Resource
             ])
             ->filters([
                 TrashedFilter::make(),
+                TrashedFilter::make(),
             ])
             ->recordActions([
                 EditAction::make()
@@ -133,7 +134,7 @@ class InsuranceResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ManageInsurances::route('/'),
+            'index' => ManageInsurances::route('/'),
         ];
     }
 

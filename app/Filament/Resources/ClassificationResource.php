@@ -5,7 +5,6 @@ namespace App\Filament\Resources;
 use BackedEnum;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
-use Filament\Tables\Actions;
 use App\Models\Classification;
 use Filament\Actions\EditAction;
 use Filament\Resources\Resource;
@@ -25,7 +24,6 @@ use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\ClassificationResource\Pages;
 use App\Filament\Resources\ClassificationResource\Pages\ManageClassification;
 
 class ClassificationResource extends Resource
@@ -138,6 +136,7 @@ class ClassificationResource extends Resource
             ])
             ->filters([
                 TrashedFilter::make(),
+                TrashedFilter::make(),
             ])
             ->recordActions([
                 EditAction::make()
@@ -169,7 +168,7 @@ class ClassificationResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ManageClassification::route('/'),
+            'index' => ManageClassification::route('/'),
         ];
     }
 

@@ -7,7 +7,6 @@ use App\Models\Country;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
 use Filament\Schemas\Schema;
-use Filament\Tables\Actions;
 use Filament\Actions\EditAction;
 use Filament\Resources\Resource;
 use Filament\Actions\DeleteAction;
@@ -23,7 +22,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Schemas\Components\Utilities\Set;
-use App\Filament\Resources\CountryResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\CountryResource\Pages\ManageCountries;
 
@@ -170,6 +168,7 @@ class CountryResource extends Resource
             ])
             ->filters([
                 TrashedFilter::make(),
+                TrashedFilter::make(),
             ])
             ->recordActions([
                 EditAction::make()
@@ -201,7 +200,7 @@ class CountryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ManageCountries::route('/'),
+            'index' => ManageCountries::route('/'),
         ];
     }
 
