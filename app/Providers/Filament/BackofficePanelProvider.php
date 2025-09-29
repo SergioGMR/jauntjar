@@ -17,6 +17,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Filament\Support\Enums\Width;
 
 class BackofficePanelProvider extends PanelProvider
 {
@@ -25,6 +26,7 @@ class BackofficePanelProvider extends PanelProvider
         return $panel
             ->default()
             ->sidebarCollapsibleOnDesktop()
+            ->maxContentWidth(Width::Full)
             ->id('backoffice')
             ->path('backoffice')
             ->login()

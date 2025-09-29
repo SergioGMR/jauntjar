@@ -2,18 +2,35 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\CityResource\Pages;
+use BackedEnum;
 use App\Models\City;
 use App\Models\Country;
-use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Forms\Set;
-use Filament\Resources\Resource;
-use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
+use Filament\Schemas\Schema;
+use Filament\Tables\Actions;
+use Filament\Actions\EditAction;
+use Filament\Resources\Resource;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Grid;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Actions\ForceDeleteBulkAction;
+use App\Filament\Resources\CityResource\Pages;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\CityResource\Pages\ManageCities;
 
 class CityResource extends Resource
 {
@@ -23,69 +40,69 @@ class CityResource extends Resource
 
     protected static ?string $pluralModelLabel = 'ciudades';
 
-    protected static ?string $navigationIcon = 'heroicon-o-building-library';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-building-library';
 
-    protected static ?string $activeNavigationIcon = 'heroicon-s-building-library';
+    protected static string|BackedEnum|null $activeNavigationIcon = 'heroicon-s-building-library';
 
     protected static ?string $navigationLabel = 'Ciudades';
 
     protected static ?int $navigationSort = 2;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
-                Forms\Components\TextInput::make('uuid')
+                TextInput::make('uuid')
                     ->label('UUID')
                     ->required()
                     ->disabled()
                     ->dehydrated(true),
-                Forms\Components\Select::make('country_id')
+                Select::make('country_id')
                     ->label('País')
                     ->searchable()
                     ->relationship('country', 'display')
-                    ->options(fn () => Country::pluck('display', 'id'))
+                    ->options(fn (): array => Country::pluck('display', 'id')->all())
                     ->live()
-                    ->afterStateUpdated(function (Set $set) {
+                    ->afterStateUpdated(function (Set $set): void {
                         $set('uuid', (string) Str::uuid());
                     })
                     ->required(),
-                Forms\Components\TextInput::make('name')
+                TextInput::make('name')
                     ->label('Nombre')
                     ->live(onBlur: true)
-                    ->afterStateUpdated(function (Set $set, ?string $state) {
+                    ->afterStateUpdated(function (Set $set, ?string $state): void {
                         $set('uuid', (string) Str::uuid());
                         $set('display', Str::title($state));
                         $set('slug', Str::slug($state));
                     })
                     ->required(),
-                Forms\Components\TextInput::make('display')
+                TextInput::make('display')
                     ->label('Nombre para mostrar')
                     ->required(),
-                Forms\Components\TextInput::make('slug')
+                TextInput::make('slug')
                     ->required(),
-                Forms\Components\Toggle::make('visited')
+                Toggle::make('visited')
                     ->label('Visitado'),
-                Forms\Components\TextInput::make('stops')
+                TextInput::make('stops')
                     ->label('Escalas')
                     ->numeric(),
-                Forms\Components\Grid::make()
+                Grid::make()
                     ->schema([
-                        Forms\Components\TextInput::make('coordinates.lat')
+                        TextInput::make('coordinates.lat')
                             ->label('Latitud')
                             ->numeric()
                             ->step(0.000001)
-                            ->afterStateUpdated(function (Set $set, $state, callable $get) {
+                            ->afterStateUpdated(function (Set $set, Get $get, ?float $state): void {
                                 $set('coordinates', [
                                     'lat' => $state,
                                     'lng' => $get('coordinates.lng'),
                                 ]);
                             }),
-                        Forms\Components\TextInput::make('coordinates.lng')
+                        TextInput::make('coordinates.lng')
                             ->label('Longitud')
                             ->numeric()
                             ->step(0.000001)
-                            ->afterStateUpdated(function (Set $set, $state, callable $get) {
+                            ->afterStateUpdated(function (Set $set, Get $get, ?float $state): void {
                                 $set('coordinates', [
                                     'lat' => $get('coordinates.lat'),
                                     'lng' => $state,
@@ -100,69 +117,69 @@ class CityResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('uuid')
+                TextColumn::make('uuid')
                     ->label('UUID')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
-                Tables\Columns\TextColumn::make('country.display')
+                TextColumn::make('country.display')
                     ->label('País')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->label('Nombre')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
-                Tables\Columns\TextColumn::make('display')
+                TextColumn::make('display')
                     ->label('Título')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('slug')
+                TextColumn::make('slug')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
-                Tables\Columns\IconColumn::make('visited')
+                IconColumn::make('visited')
                     ->label('Visitado')
                     ->boolean(),
-                Tables\Columns\TextColumn::make('visited_at')
+                TextColumn::make('visited_at')
                     ->label('Fecha de visita')
                     ->date('d/m/Y')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
+                TrashedFilter::make(),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make()
+            ->recordActions([
+                EditAction::make()
                     ->label('')
                     ->modalHeading('Editar')
                     ->modalDescription('Editar la ciudad'),
-                Tables\Actions\DeleteAction::make()
+                DeleteAction::make()
                     ->label('')
                     ->modalHeading('Eliminar')
                     ->modalDescription('Eliminar la ciudad'),
-                Tables\Actions\ForceDeleteAction::make()
+                ForceDeleteAction::make()
                     ->label('')
                     ->modalHeading('Destruir')
                     ->modalDescription('Destruir la ciudad'),
-                Tables\Actions\RestoreAction::make()
+                RestoreAction::make()
                     ->label('')
                     ->modalHeading('Recuperar')
                     ->modalDescription('Recuperar la ciudad'),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
                 ]),
             ]);
     }

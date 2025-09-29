@@ -2,48 +2,70 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\InsuranceResource\Pages;
+use BackedEnum;
 use App\Models\Insurance;
-use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
-use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
-use Filament\Forms\Set;
+use Filament\Schemas\Schema;
+use Filament\Tables\Actions;
+use Filament\Actions\EditAction;
+use Filament\Resources\Resource;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Schemas\Components\Utilities\Set;
+use App\Filament\Resources\InsuranceResource\Pages;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\InsuranceResource\Pages\ManageInsurances;
 
 class InsuranceResource extends Resource
 {
     protected static ?string $model = Insurance::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $modelLabel = 'seguro';
 
-    public static function form(Form $form): Form
+    protected static ?string $pluralModelLabel = 'seguros';
+
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-shield-check';
+
+    protected static string|BackedEnum|null $activeNavigationIcon = 'heroicon-s-shield-check';
+
+    protected static ?string $navigationLabel = 'Seguros';
+
+    protected static ?int $navigationSort = 5;
+
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
-                Forms\Components\TextInput::make('uuid')
+                TextInput::make('uuid')
                     ->label('UUID')
                     ->required()
                     ->disabled()
                     ->dehydrated(true),
-                Forms\Components\TextInput::make('name')
+                TextInput::make('name')
                     ->label('Nombre')
                     ->live(onBlur: true)
-                    ->afterStateUpdated(function (Set $set, ?string $state) {
+                    ->afterStateUpdated(function (Set $set, ?string $state): void {
                         $set('uuid', (string) Str::uuid());
                         $set('display', Str::title($state));
                         $set('slug', Str::slug($state));
                     })
                     ->required(),
-                Forms\Components\TextInput::make('display')
+                TextInput::make('display')
                     ->label('Nombre para mostrar')
                     ->required(),
-                Forms\Components\TextInput::make('slug')
+                TextInput::make('slug')
                     ->required(),
-                Forms\Components\TextInput::make('url')
+                TextInput::make('url')
                     ->required(),
             ]);
     }
@@ -52,44 +74,58 @@ class InsuranceResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('uuid')
+                TextColumn::make('uuid')
                     ->label('UUID')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('display')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('display')
+                TextColumn::make('slug')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('slug')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('url')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('url')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
+                TrashedFilter::make(),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-                Tables\Actions\ForceDeleteAction::make(),
-                Tables\Actions\RestoreAction::make(),
+            ->recordActions([
+                EditAction::make()
+                    ->label('')
+                    ->modalHeading('Editar')
+                    ->modalDescription('Editar el seguro'),
+                DeleteAction::make()
+                    ->label('')
+                    ->modalHeading('Eliminar')
+                    ->modalDescription('Eliminar el seguro'),
+                ForceDeleteAction::make()
+                    ->label('')
+                    ->modalHeading('Destruir')
+                    ->modalDescription('Destruir el seguro'),
+                RestoreAction::make()
+                    ->label('')
+                    ->modalHeading('Recuperar')
+                    ->modalDescription('Recuperar el seguro'),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
                 ]),
             ]);
     }
