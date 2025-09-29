@@ -2,34 +2,46 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use App\Filament\Resources\InsuranceResource\Pages\ManageInsurances;
 use App\Filament\Resources\InsuranceResource\Pages;
 use App\Models\Insurance;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
-use Filament\Forms\Set;
 
 class InsuranceResource extends Resource
 {
     protected static ?string $model = Insurance::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('uuid')
+        return $schema
+            ->components([
+                TextInput::make('uuid')
                     ->label('UUID')
                     ->required()
                     ->disabled()
                     ->dehydrated(true),
-                Forms\Components\TextInput::make('name')
+                TextInput::make('name')
                     ->label('Nombre')
                     ->live(onBlur: true)
                     ->afterStateUpdated(function (Set $set, ?string $state) {
@@ -38,12 +50,12 @@ class InsuranceResource extends Resource
                         $set('slug', Str::slug($state));
                     })
                     ->required(),
-                Forms\Components\TextInput::make('display')
+                TextInput::make('display')
                     ->label('Nombre para mostrar')
                     ->required(),
-                Forms\Components\TextInput::make('slug')
+                TextInput::make('slug')
                     ->required(),
-                Forms\Components\TextInput::make('url')
+                TextInput::make('url')
                     ->required(),
             ]);
     }
@@ -52,44 +64,44 @@ class InsuranceResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('uuid')
+                TextColumn::make('uuid')
                     ->label('UUID')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('display')
+                TextColumn::make('display')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('slug')
+                TextColumn::make('slug')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('url')
+                TextColumn::make('url')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
+                TrashedFilter::make(),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-                Tables\Actions\ForceDeleteAction::make(),
-                Tables\Actions\RestoreAction::make(),
+            ->recordActions([
+                EditAction::make(),
+                DeleteAction::make(),
+                ForceDeleteAction::make(),
+                RestoreAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
                 ]),
             ]);
     }
@@ -97,7 +109,7 @@ class InsuranceResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ManageInsurances::route('/'),
+            'index' => ManageInsurances::route('/'),
         ];
     }
 

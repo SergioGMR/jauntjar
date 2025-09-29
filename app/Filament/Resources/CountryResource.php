@@ -2,11 +2,24 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Forms\Components\Select;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use App\Filament\Resources\CountryResource\Pages\ManageCountries;
 use App\Filament\Resources\CountryResource\Pages;
 use App\Filament\Resources\CountryResource\RelationManagers;
 use App\Models\Country;
-use Filament\Forms\Form;
-use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use Filament\Forms;
@@ -23,24 +36,24 @@ class CountryResource extends Resource
 
     protected static ?string $pluralModelLabel = 'países';
 
-    protected static ?string $navigationIcon = 'heroicon-o-flag';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-flag';
 
-    protected static ?string $activeNavigationIcon = 'heroicon-s-flag';
+    protected static string | \BackedEnum | null $activeNavigationIcon = 'heroicon-s-flag';
 
     protected static ?string $navigationLabel = 'Países';
 
     protected static ?int $navigationSort = 1;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('uuid')
+        return $schema
+            ->components([
+                TextInput::make('uuid')
                     ->label('UUID')
                     ->required()
                     ->disabled()
                     ->dehydrated(true),
-                Forms\Components\TextInput::make('name')
+                TextInput::make('name')
                     ->label('Nombre')
                     ->live(onBlur: true)
                     ->afterStateUpdated(function (Set $set, ?string $state) {
@@ -49,46 +62,46 @@ class CountryResource extends Resource
                         $set('slug', Str::slug($state));
                     })
                     ->required(),
-                Forms\Components\TextInput::make('display')
+                TextInput::make('display')
                     ->required(),
-                Forms\Components\TextInput::make('slug')
+                TextInput::make('slug')
                     ->disabled()
                     ->dehydrated(true)
                     ->required(),
-                Forms\Components\TextInput::make('code')
+                TextInput::make('code')
                     ->label('Código')
                     ->required(),
-                Forms\Components\TextInput::make('currency')
+                TextInput::make('currency')
                     ->label('Moneda')
                     ->required(),
-                Forms\Components\TextInput::make('pibpc')
+                TextInput::make('pibpc')
                     ->label('PIB per capita')
                     ->required()
                     ->integer(),
-                Forms\Components\TextInput::make('womens_rights')
+                TextInput::make('womens_rights')
                     ->label('Derechos de las mujeres')
                     ->required()
                     ->numeric()
                     ->default(0)
                     ->minValue(0)
                     ->maxValue(10),
-                Forms\Components\TextInput::make('lgtb_rights')
+                TextInput::make('lgtb_rights')
                     ->label('Derechos de LGTBIQ+')
                     ->required()
                     ->numeric()
                     ->default(0)
                     ->minValue(0)
                     ->maxValue(10),
-                Forms\Components\Select::make('visa')
+                Select::make('visa')
                     ->options([
                         'No' => 'No',
                         'Sí' => 'Sí',
                     ])
                     ->required(),
-                Forms\Components\TextInput::make('language')
+                TextInput::make('language')
                     ->label('Idioma')
                     ->required(),
-                Forms\Components\Select::make('roaming')
+                Select::make('roaming')
                     ->options([
                         'N/A' => 'N/A',
                         '1' => 'Zona 1',
@@ -103,85 +116,85 @@ class CountryResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('uuid')
+                TextColumn::make('uuid')
                     ->label('UUID')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->label('Nombre')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
-                Tables\Columns\TextColumn::make('display')
+                TextColumn::make('display')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('slug')
+                TextColumn::make('slug')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('code')
+                TextColumn::make('code')
                     ->label('Código')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('currency')
+                TextColumn::make('currency')
                     ->label('Moneda')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('pibpc')
+                TextColumn::make('pibpc')
                     ->label('PIB per capita')
                     ->suffix(' €')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('womens_rights')
+                TextColumn::make('womens_rights')
                     ->label('D. mujeres')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('lgtb_rights')
+                TextColumn::make('lgtb_rights')
                     ->label('D. LGTBIQ+')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('visa')
+                TextColumn::make('visa')
                     ->label('Visa')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('language')
+                TextColumn::make('language')
                     ->label('Idioma')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('roaming')
+                TextColumn::make('roaming')
                     ->label('Roaming')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
+                TrashedFilter::make(),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make()
+            ->recordActions([
+                EditAction::make()
                     ->label('')
                     ->modalHeading('Editar')
                     ->modalDescription('Editar el país'),
-                Tables\Actions\DeleteAction::make()
+                DeleteAction::make()
                     ->label('')
                     ->modalHeading('Eliminar')
                     ->modalDescription('Eliminar el país'),
-                Tables\Actions\ForceDeleteAction::make()
+                ForceDeleteAction::make()
                     ->label('')
                     ->modalHeading('Destruir')
                     ->modalDescription('Destruir el país'),
-                Tables\Actions\RestoreAction::make()
+                RestoreAction::make()
                     ->label('')
                     ->modalHeading('Recuperar')
                     ->modalDescription('Recuperar el país'),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
                 ]),
             ]);
     }
@@ -189,7 +202,7 @@ class CountryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ManageCountries::route('/'),
+            'index' => ManageCountries::route('/'),
         ];
     }
 

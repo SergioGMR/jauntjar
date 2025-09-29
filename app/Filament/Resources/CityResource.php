@@ -2,12 +2,28 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Grid;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use App\Filament\Resources\CityResource\Pages\ManageCities;
 use App\Filament\Resources\CityResource\Pages;
 use App\Models\City;
 use App\Models\Country;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -23,24 +39,24 @@ class CityResource extends Resource
 
     protected static ?string $pluralModelLabel = 'ciudades';
 
-    protected static ?string $navigationIcon = 'heroicon-o-building-library';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-building-library';
 
-    protected static ?string $activeNavigationIcon = 'heroicon-s-building-library';
+    protected static string | \BackedEnum | null $activeNavigationIcon = 'heroicon-s-building-library';
 
     protected static ?string $navigationLabel = 'Ciudades';
 
     protected static ?int $navigationSort = 2;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('uuid')
+        return $schema
+            ->components([
+                TextInput::make('uuid')
                     ->label('UUID')
                     ->required()
                     ->disabled()
                     ->dehydrated(true),
-                Forms\Components\Select::make('country_id')
+                Select::make('country_id')
                     ->label('País')
                     ->searchable()
                     ->relationship('country', 'display')
@@ -50,7 +66,7 @@ class CityResource extends Resource
                         $set('uuid', (string) Str::uuid());
                     })
                     ->required(),
-                Forms\Components\TextInput::make('name')
+                TextInput::make('name')
                     ->label('Nombre')
                     ->live(onBlur: true)
                     ->afterStateUpdated(function (Set $set, ?string $state) {
@@ -59,19 +75,19 @@ class CityResource extends Resource
                         $set('slug', Str::slug($state));
                     })
                     ->required(),
-                Forms\Components\TextInput::make('display')
+                TextInput::make('display')
                     ->label('Nombre para mostrar')
                     ->required(),
-                Forms\Components\TextInput::make('slug')
+                TextInput::make('slug')
                     ->required(),
-                Forms\Components\Toggle::make('visited')
+                Toggle::make('visited')
                     ->label('Visitado'),
-                Forms\Components\TextInput::make('stops')
+                TextInput::make('stops')
                     ->label('Escalas')
                     ->numeric(),
-                Forms\Components\Grid::make()
+                Grid::make()
                     ->schema([
-                        Forms\Components\TextInput::make('coordinates.lat')
+                        TextInput::make('coordinates.lat')
                             ->label('Latitud')
                             ->numeric()
                             ->step(0.000001)
@@ -81,7 +97,7 @@ class CityResource extends Resource
                                     'lng' => $get('coordinates.lng'),
                                 ]);
                             }),
-                        Forms\Components\TextInput::make('coordinates.lng')
+                        TextInput::make('coordinates.lng')
                             ->label('Longitud')
                             ->numeric()
                             ->step(0.000001)
@@ -100,69 +116,69 @@ class CityResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('uuid')
+                TextColumn::make('uuid')
                     ->label('UUID')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
-                Tables\Columns\TextColumn::make('country.display')
+                TextColumn::make('country.display')
                     ->label('País')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->label('Nombre')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
-                Tables\Columns\TextColumn::make('display')
+                TextColumn::make('display')
                     ->label('Título')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('slug')
+                TextColumn::make('slug')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
-                Tables\Columns\IconColumn::make('visited')
+                IconColumn::make('visited')
                     ->label('Visitado')
                     ->boolean(),
-                Tables\Columns\TextColumn::make('visited_at')
+                TextColumn::make('visited_at')
                     ->label('Fecha de visita')
                     ->date('d/m/Y')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
+                TrashedFilter::make(),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make()
+            ->recordActions([
+                EditAction::make()
                     ->label('')
                     ->modalHeading('Editar')
                     ->modalDescription('Editar la ciudad'),
-                Tables\Actions\DeleteAction::make()
+                DeleteAction::make()
                     ->label('')
                     ->modalHeading('Eliminar')
                     ->modalDescription('Eliminar la ciudad'),
-                Tables\Actions\ForceDeleteAction::make()
+                ForceDeleteAction::make()
                     ->label('')
                     ->modalHeading('Destruir')
                     ->modalDescription('Destruir la ciudad'),
-                Tables\Actions\RestoreAction::make()
+                RestoreAction::make()
                     ->label('')
                     ->modalHeading('Recuperar')
                     ->modalDescription('Recuperar la ciudad'),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
                 ]),
             ]);
     }
@@ -170,7 +186,7 @@ class CityResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ManageCities::route('/'),
+            'index' => ManageCities::route('/'),
         ];
     }
 
