@@ -16,8 +16,15 @@ class AirlineFactory extends Factory
      */
     public function definition(): array
     {
+        $name = fake()->company();
+
         return [
-            //
+            'uuid' => fake()->uuid(),
+            'name' => $name,
+            'display' => $name,
+            'slug' => fake()->slug(),
+            'logo' => fake()->imageUrl(200, 100, 'airline'),
+            'is_low_cost' => fake()->boolean(),
         ];
     }
 }
