@@ -1,35 +1,67 @@
 
 
-[1;37;40mCode Coverage Report:     [0m
-[1;37;40m  2025-09-29 10:47:23     [0m
-[1;37;40m                          [0m
-[1;37;40m Summary:                 [0m
-[37;41m  Classes: 17.86% (5/28)  [0m
-[37;41m  Methods: 26.32% (15/57) [0m
-[37;41m  Lines:    8.45% (79/935)[0m
+[1;37;40mCode Coverage Report:       [0m
+[1;37;40m  2025-09-29 19:56:26       [0m
+[1;37;40m                            [0m
+[1;37;40m Summary:                   [0m
+[30;43m  Classes: 67.74% (21/31)   [0m
+[30;43m  Methods: 89.91% (98/109)  [0m
+[30;42m  Lines:   94.11% (975/1036)[0m
 
 App\Filament\Resources\AirlineResource
-  [37;41mMethods:  25.00% ( 1/ 4)[0m   [37;41mLines:   3.26% (  3/ 92)[0m
+  [30;43mMethods:  75.00% ( 3/ 4)[0m   [30;42mLines:  96.77% ( 90/ 93)[0m
+App\Filament\Resources\AirlineResource\Pages\ManageAirlines
+  [30;42mMethods: 100.00% ( 1/ 1)[0m   [30;42mLines: 100.00% (  3/  3)[0m
 App\Filament\Resources\BudgetResource
-  [37;41mMethods:  25.00% ( 1/ 4)[0m   [37;41mLines:   1.47% (  3/204)[0m
+  [30;43mMethods:  75.00% ( 3/ 4)[0m   [30;42mLines:  90.73% (186/205)[0m
+App\Filament\Resources\BudgetResource\Pages\ManageBudgets
+  [30;42mMethods: 100.00% ( 1/ 1)[0m   [30;42mLines: 100.00% (  3/  3)[0m
 App\Filament\Resources\CityResource
-  [37;41mMethods:  25.00% ( 1/ 4)[0m   [37;41mLines:   2.22% (  3/135)[0m
+  [30;43mMethods:  75.00% ( 3/ 4)[0m   [30;42mLines:  91.18% (124/136)[0m
+App\Filament\Resources\CityResource\Pages\ManageCities
+  [30;42mMethods: 100.00% ( 1/ 1)[0m   [30;42mLines: 100.00% (  3/  3)[0m
 App\Filament\Resources\ClassificationResource
-  [37;41mMethods:  25.00% ( 1/ 4)[0m   [37;41mLines:   2.56% (  3/117)[0m
+  [30;43mMethods:  75.00% ( 3/ 4)[0m   [30;42mLines:  93.22% (110/118)[0m
+App\Filament\Resources\ClassificationResource\Pages\ManageClassification
+  [30;42mMethods: 100.00% ( 1/ 1)[0m   [30;42mLines: 100.00% (  3/  3)[0m
 App\Filament\Resources\CountryResource
-  [37;41mMethods:  25.00% ( 1/ 4)[0m   [37;41mLines:   1.95% (  3/154)[0m
+  [30;43mMethods:  75.00% ( 3/ 4)[0m   [30;42mLines:  98.06% (152/155)[0m
+App\Filament\Resources\CountryResource\Pages\ManageCountries
+  [30;42mMethods: 100.00% ( 1/ 1)[0m   [30;42mLines: 100.00% (  3/  3)[0m
 App\Filament\Resources\InsuranceResource
-  [37;41mMethods:  25.00% ( 1/ 4)[0m   [37;41mLines:   3.45% (  3/ 87)[0m
+  [30;43mMethods:  75.00% ( 3/ 4)[0m   [30;42mLines:  96.59% ( 85/ 88)[0m
+App\Filament\Resources\InsuranceResource\Pages\ManageInsurances
+  [30;42mMethods: 100.00% ( 1/ 1)[0m   [30;42mLines: 100.00% (  3/  3)[0m
 App\Http\Controllers\Auth\VerifyEmailController
   [37;41mMethods:   0.00% ( 0/ 1)[0m   [30;43mLines:  83.33% (  5/  6)[0m
 App\Livewire\Actions\Logout
   [30;42mMethods: 100.00% ( 1/ 1)[0m   [30;42mLines: 100.00% (  4/  4)[0m
+App\Livewire\ClasificadosListado
+  [30;43mMethods:  80.00% ( 4/ 5)[0m   [30;43mLines:  81.08% ( 30/ 37)[0m
 App\Livewire\Components\MapsGoogle
-  [37;41mMethods:  50.00% ( 1/ 2)[0m   [37;41mLines:  33.33% (  3/  9)[0m
+  [30;42mMethods: 100.00% ( 2/ 2)[0m   [30;42mLines: 100.00% (  9/  9)[0m
+App\Livewire\PlaneadosListado
+  [30;42mMethods: 100.00% ( 1/ 1)[0m   [30;42mLines: 100.00% (  6/  6)[0m
+App\Livewire\VisitadosListado
+  [30;42mMethods: 100.00% ( 1/ 1)[0m   [30;42mLines: 100.00% (  6/  6)[0m
+App\Models\Airline
+  [30;42mMethods: 100.00% ( 4/ 4)[0m   [30;42mLines: 100.00% (  6/  6)[0m
+App\Models\Budget
+  [30;42mMethods: 100.00% (11/11)[0m   [30;42mLines: 100.00% ( 14/ 14)[0m
+App\Models\City
+  [30;42mMethods: 100.00% (20/20)[0m   [30;42mLines: 100.00% ( 27/ 27)[0m
+App\Models\Classification
+  [30;42mMethods: 100.00% ( 6/ 6)[0m   [30;42mLines: 100.00% ( 16/ 16)[0m
+App\Models\Country
+  [30;42mMethods: 100.00% ( 8/ 8)[0m   [30;42mLines: 100.00% ( 12/ 12)[0m
+App\Models\Destination
+  [30;42mMethods: 100.00% ( 6/ 6)[0m   [30;42mLines: 100.00% ( 15/ 15)[0m
+App\Models\Insurance
+  [30;42mMethods: 100.00% ( 3/ 3)[0m   [30;42mLines: 100.00% (  5/  5)[0m
 App\Models\User
   [30;42mMethods: 100.00% ( 2/ 2)[0m   [30;42mLines: 100.00% (  8/  8)[0m
 App\Providers\AppServiceProvider
-  [30;42mMethods: 100.00% ( 2/ 2)[0m   [30;42mLines: 100.00% (  2/  2)[0m
+  [30;42mMethods: 100.00% ( 2/ 2)[0m   [30;42mLines: 100.00% (  8/  8)[0m
 App\Providers\Filament\BackofficePanelProvider
   [30;42mMethods: 100.00% ( 1/ 1)[0m   [30;42mLines: 100.00% ( 34/ 34)[0m
 App\Providers\VoltServiceProvider
