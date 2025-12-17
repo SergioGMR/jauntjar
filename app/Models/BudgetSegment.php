@@ -15,7 +15,10 @@ class BudgetSegment extends Model
         'budget_id',
         'origin_city_id',
         'destination_city_id',
+        'transport_kind',
+        'transport_price',
         'stay_days',
+        'stay_price',
         'order',
     ];
 

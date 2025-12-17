@@ -22,8 +22,11 @@ class Budget extends Model
         'is_open_jaw',
         'origin_city_id',
         'flight_ticket_price',
+        'stay_price',
         'insurance_price',
         'total_price',
+        'departed_at',
+        'arrived_at',
     ];
 
     protected function casts(): array

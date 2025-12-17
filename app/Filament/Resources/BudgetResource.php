@@ -7,6 +7,7 @@ use App\Models\Budget;
 use App\Models\City;
 use App\Models\Country;
 use BackedEnum;
+use Dom\Text;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -53,7 +54,8 @@ class BudgetResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        $default = City::where('slug','las-palmas')->first()?->id ?? null;
+        $default = City::where('slug', 'las-palmas')->first()?->id ?? null;
+
         return $schema
             ->schema([
                 Select::make('airline_id')
@@ -193,7 +195,10 @@ class BudgetResource extends Resource
                     ->hidden(fn (Get $get): bool => $get('is_open_jaw'))
                     ->helperText(fn (Get $get): ?string => $get('is_open_jaw') ? 'Se calcula automáticamente' : null),
                 Placeholder::make('calculated_return_date')
+                    ->disabled()
                     ->label('Fecha de vuelta calculada')
+                    ->live()
+                    ->debounce(500)
                     ->content(function (Get $get, ?Budget $record): string {
                         if (! $record || ! $record->departed_at) {
                             return 'Selecciona fecha de salida';
@@ -209,7 +214,7 @@ class BudgetResource extends Resource
                     ->visible(fn (Get $get): bool => $get('is_open_jaw'))
                     ->schema([
                         Repeater::make('segments')
-                            ->label('')
+                            ->label('Tramos')
                             ->relationship()
                             ->schema([
                                 Select::make('origin_city_id')
@@ -256,9 +261,32 @@ class BudgetResource extends Resource
                                     ])
                                     ->preload()
                                     ->required(),
+                                Select::make('transport_kind')
+                                    ->label('Tipo de transporte')
+                                    ->options([
+                                        'plane' => 'Avión',
+                                        'boat' => 'Barco',
+                                        'car' => 'Coche',
+                                        'bus' => 'Guagua',
+                                        'train' => 'Tren',
+                                        'other' => 'Otro',
+                                    ])
+                                    ->required(),
+                                TextInput::make('transport_price')
+                                    ->label('Precio del transporte')
+                                    ->numeric()
+                                    ->default(0)
+                                    ->minValue(0)
+                                    ->required(),
                                 TextInput::make('stay_days')
                                     ->label('Días de estancia')
                                     ->helperText('Días en el destino antes del siguiente vuelo')
+                                    ->numeric()
+                                    ->default(0)
+                                    ->minValue(0)
+                                    ->required(),
+                                TextInput::make('stay_price')
+                                    ->label('Precio de la estancia')
                                     ->numeric()
                                     ->default(0)
                                     ->minValue(0)
@@ -270,6 +298,21 @@ class BudgetResource extends Resource
                             ->addActionLabel('Añadir tramo')
                             ->defaultItems(0)
                             ->collapsible()
+                            ->live()
+                            ->debounce(500)
+                            ->afterStateUpdated(function (Get $get, Set $set): void {
+                                $totalStayPrice = 0;
+                                $totalTransportPrice = 0;
+
+                                $segments = $get('segments') ?? [];
+
+                                foreach ($segments as $segment) {
+                                    $totalStayPrice += (int) ($segment['stay_price'] ?? 0);
+                                    $totalTransportPrice += (int) ($segment['transport_price'] ?? 0);
+                                }
+                                $set('stay_price', $totalStayPrice);
+                                $set('flight_ticket_price', $totalTransportPrice);
+                            })
                             ->itemLabel(fn (array $state): ?string => isset($state['origin_city_id'], $state['destination_city_id'])
                                     ? "Tramo: {$state['stay_days']} días"
                                     : null
@@ -283,12 +326,34 @@ class BudgetResource extends Resource
                     ->live()
                     ->debounce(500)
                     ->afterStateUpdated(function (Get $get, Set $set): void {
-                        $total = (int) ($get('flight_ticket_price') ?? 0)
-                            + (int) ($get('insurance_price') ?? 0)
-                            + (int) ($get('accommodation_price') ?? 0)
-                            + (int) ($get('transport_price') ?? 0);
+                        if (! $get('is_open_jaw')) {
+                            $total = (int) ($get('flight_ticket_price') ?? 0)
+                                + (int) ($get('insurance_price') ?? 0)
+                                + (int) ($get('stay_price') ?? 0)
+                                + (int) ($get('flight_ticket_price') ?? 0);
 
-                        $set('total_price', $total);
+                            $set('total_price', $total);
+                            return;
+                        }
+                        // $total = (int) ($get('flight_ticket_price') ?? 0)
+                        //     + (int) ($get('insurance_price') ?? 0)
+                        //     + (int) ($get('stay_price') ?? 0)
+                        //     + (int) ($get('flight_ticket_price') ?? 0);
+
+                        // $set('total_price', $total);
+                    })
+                    ->numeric(),
+                TextInput::make('stay_price')
+                    ->label('Precio de la estancia')
+                    ->required()
+                    ->live()
+                    ->afterStateUpdated(function (Get $get, Set $set): void {
+                        // $total = (int) ($get('flight_ticket_price') ?? 0)
+                        //     + (int) ($get('insurance_price') ?? 0)
+                        //     + (int) ($get('stay_price') ?? 0)
+                        //     + (int) ($get('flight_ticket_price') ?? 0);
+
+                        // $set('total_price', $total);
                     })
                     ->numeric(),
                 TextInput::make('insurance_price')
@@ -298,7 +363,7 @@ class BudgetResource extends Resource
                     ->afterStateUpdated(function (Get $get, Set $set): void {
                         $total = (int) ($get('flight_ticket_price') ?? 0)
                             + (int) ($get('insurance_price') ?? 0)
-                            + (int) ($get('accommodation_price') ?? 0)
+                            + (int) ($get('stay_price') ?? 0)
                             + (int) ($get('transport_price') ?? 0);
 
                         $set('total_price', $total);
