@@ -56,12 +56,12 @@
                 {{-- Logo --}}
                 <a href="/" class="flex items-center gap-3 group">
                     <img 
-                        src="{{ Vite::asset('resources/images/logos/light-navbarlogo.webp') }}" 
+                        src="{{ secure_asset('images/logos/light-navbarlogo.webp') }}" 
                         alt="{{ config('app.name') }}" 
                         class="h-10 w-auto hidden dark:block"
                     >
                     <img 
-                        src="{{ Vite::asset('resources/images/logos/dark-navbarlogo.webp') }}" 
+                        src="{{ secure_asset('images/logos/dark-navbarlogo.webp') }}" 
                         alt="{{ config('app.name') }}" 
                         class="h-10 w-auto block dark:hidden"
                     >
@@ -453,12 +453,12 @@
             <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div class="flex items-center gap-3">
                     <img 
-                        src="{{ Vite::asset('resources/images/logos/light-navbarlogo.webp') }}" 
+                        src="{{ asset('images/logos/light-navbarlogo.webp') }}" 
                         alt="{{ config('app.name') }}" 
                         class="h-8 w-auto hidden dark:block"
                     >
                     <img 
-                        src="{{ Vite::asset('resources/images/logos/dark-navbarlogo.webp') }}" 
+                        src="{{ asset('images/logos/dark-navbarlogo.webp') }}" 
                         alt="{{ config('app.name') }}" 
                         class="h-8 w-auto block dark:hidden"
                     >

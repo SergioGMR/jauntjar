@@ -29,8 +29,5 @@ bun.lock
 /.vscode
 /.zed
 public/fonts
-public/images
-public/css
-public/js
 coverage-report/*
 tests/Browser/Screenshots
