@@ -74,3 +74,72 @@ it('casts integer fields correctly', function () {
     expect($country->womens_rights)->toBeInt();
     expect($country->lgtb_rights)->toBeInt();
 });
+
+it('has all required fillable fields', function () {
+    $country = Country::factory()->create([
+        'uuid' => 'test-uuid-123',
+        'name' => 'Test Country',
+        'display' => 'Test Country Display',
+        'slug' => 'test-country',
+        'code' => 'TC',
+        'currency' => 'EUR',
+        'pibpc' => 35000,
+        'womens_rights' => 8,
+        'lgtb_rights' => 7,
+        'visa' => 'Sí',
+        'language' => 'es',
+        'roaming' => 'Incluido',
+    ]);
+
+    expect($country->uuid)->toBe('test-uuid-123');
+    expect($country->name)->toBe('Test Country');
+    expect($country->display)->toBe('Test Country Display');
+    expect($country->slug)->toBe('test-country');
+    expect($country->code)->toBe('TC');
+    expect($country->currency)->toBe('EUR');
+    expect($country->pibpc)->toBe(35000);
+    expect($country->womens_rights)->toBe(8);
+    expect($country->lgtb_rights)->toBe(7);
+    expect($country->visa)->toBe('Sí');
+    expect($country->language)->toBe('es');
+    expect($country->roaming)->toBe('Incluido');
+});
+
+it('uses soft deletes', function () {
+    $country = Country::factory()->create();
+    $countryId = $country->id;
+
+    $country->delete();
+
+    expect(Country::find($countryId))->toBeNull();
+    expect(Country::withTrashed()->find($countryId))->not->toBeNull();
+});
+
+it('has factory trait', function () {
+    expect(Country::factory())->toBeInstanceOf(\Illuminate\Database\Eloquent\Factories\Factory::class);
+});
+
+it('does not use timestamps', function () {
+    $country = new Country();
+    expect($country->timestamps)->toBeFalse();
+});
+
+it('handles different visa values', function () {
+    $visaSi = Country::factory()->create(['visa' => 'Sí']);
+    $visaNo = Country::factory()->create(['visa' => 'No']);
+    $visaEvisa = Country::factory()->create(['visa' => 'eVisa']);
+
+    expect($visaSi->requiresVisa())->toBeTrue();
+    expect($visaNo->requiresVisa())->toBeFalse();
+    expect($visaEvisa->requiresVisa())->toBeFalse();
+});
+
+it('handles different roaming values', function () {
+    $roamingIncluded = Country::factory()->create(['roaming' => 'Incluido']);
+    $roamingNA = Country::factory()->create(['roaming' => 'N/A']);
+    $roamingExtra = Country::factory()->create(['roaming' => 'Extra']);
+
+    expect($roamingIncluded->hasRoamingIncluded())->toBeTrue();
+    expect($roamingNA->hasRoamingIncluded())->toBeFalse();
+    expect($roamingExtra->hasRoamingIncluded())->toBeFalse();
+});

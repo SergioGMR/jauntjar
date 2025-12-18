@@ -76,3 +76,34 @@ it('generates route description', function () {
 it('has factory trait', function () {
     expect(BudgetSegment::factory())->toBeInstanceOf(\Illuminate\Database\Eloquent\Factories\Factory::class);
 });
+
+it('has transport_kind field', function () {
+    $segment = BudgetSegment::factory()->create(['transport_kind' => 'plane']);
+
+    expect($segment->transport_kind)->toBe('plane');
+});
+
+it('has transport_price field', function () {
+    $segment = BudgetSegment::factory()->create(['transport_price' => 250]);
+
+    expect($segment->transport_price)->toBe(250);
+});
+
+it('has stay_price field', function () {
+    $segment = BudgetSegment::factory()->create(['stay_price' => 500]);
+
+    expect($segment->stay_price)->toBe(500);
+});
+
+it('can be ordered by order field', function () {
+    $budget = Budget::factory()->create(['is_open_jaw' => true]);
+    
+    $segment3 = BudgetSegment::factory()->create(['budget_id' => $budget->id, 'order' => 2]);
+    $segment1 = BudgetSegment::factory()->create(['budget_id' => $budget->id, 'order' => 0]);
+    $segment2 = BudgetSegment::factory()->create(['budget_id' => $budget->id, 'order' => 1]);
+
+    $orderedSegments = $budget->segments()->orderBy('order')->get();
+
+    expect($orderedSegments->first()->id)->toBe($segment1->id);
+    expect($orderedSegments->last()->id)->toBe($segment3->id);
+});
