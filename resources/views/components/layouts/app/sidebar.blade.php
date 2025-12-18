@@ -15,9 +15,17 @@
 
         <flux:navlist variant="outline">
             <flux:navlist.group class="grid">
+                <flux:navlist.item icon="globe-alt" href="/" :current="request()->is('/')" wire:navigate>
+                    {{ __('Home') }}
+                </flux:navlist.item>
                 <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')"
                     wire:navigate>{{ __('Dashboard') }}
                 </flux:navlist.item>
+                @if(auth()->user()?->canAccessPanel(\Filament\Facades\Filament::getPanel('backoffice')))
+                    <flux:navlist.item icon="cog" href="/backoffice" :current="request()->is('backoffice*')">
+                        {{ __('Backoffice') }}
+                    </flux:navlist.item>
+                @endif
             </flux:navlist.group>
         </flux:navlist>
 
