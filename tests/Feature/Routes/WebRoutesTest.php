@@ -15,7 +15,7 @@ describe('Public Routes', function () {
     it('home page has expected content', function () {
         $this->get('/')
             ->assertOk()
-            ->assertSee('Laravel');
+            ->assertSee(config('app.name'));
     });
 });
 

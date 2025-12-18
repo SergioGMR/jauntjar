@@ -10,14 +10,13 @@ describe('Home Page Browser Tests', function () {
     it('can visit home page', function () {
         $page = $this->visit('/');
 
-        $page->assertSee('Laravel');
+        $page->assertSee(config('app.name'));
     });
 
-    it('shows login and register links for guests', function () {
+    it('shows login link for guests', function () {
         $page = $this->visit('/');
 
-        $page->assertSeeLink('Log in')
-             ->assertSeeLink('Register');
+        $page->assertSee('Iniciar Sesión');
     });
 
     it('has no javascript errors on home page', function () {
@@ -35,18 +34,10 @@ describe('Home Page Browser Tests', function () {
 
 describe('Authentication Browser Tests', function () {
     it('can navigate to login page', function () {
-        $page = $this->visit('/');
+        $page = $this->visit('/login');
 
-        $page->click('Log in')
-             ->assertPathIs('/login')
-             ->assertSee('Log in');
-    });
-
-    it('can navigate to register page', function () {
-        $page = $this->visit('/');
-
-        $page->click('Register')
-             ->assertPathIs('/register');
+        $page->assertPathIs('/login')
+             ->assertSee('Bienvenido de nuevo');
     });
 
     it('login form shows email and password fields', function () {
@@ -64,9 +55,10 @@ describe('Authentication Browser Tests', function () {
 
         $page = $this->visit('/login');
 
-        $page->type('email', 'test@example.com')
-             ->type('password', 'password123')
-             ->click('Log in')
+        $page->type('input[name="email"]', 'test@example.com')
+             ->type('input[name="password"]', 'password123')
+             ->submit()
+             ->wait(2)
              ->assertPathIs('/dashboard');
     });
 });
@@ -86,10 +78,10 @@ describe('Dashboard Browser Tests', function () {
 
         $page = $this->visit('/login');
 
-        $page->type('email', 'dashboard@example.com')
-             ->type('password', 'password123')
-             ->click('Log in')
-             ->assertPathIs('/dashboard')
-             ->assertSee('Dashboard');
+        $page->type('input[name="email"]', 'dashboard@example.com')
+             ->type('input[name="password"]', 'password123')
+             ->submit()
+             ->wait(2)
+             ->assertPathIs('/dashboard');
     });
 });

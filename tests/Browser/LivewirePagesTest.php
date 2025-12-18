@@ -24,9 +24,10 @@ describe('Visitados Page Browser Tests', function () {
 
         $page = $this->visit('/login');
 
-        $page->type('email', 'visitados@example.com')
-             ->type('password', 'password123')
-             ->click('Log in')
+        $page->type('input[name="email"]', 'visitados@example.com')
+             ->type('input[name="password"]', 'password123')
+             ->submit()
+             ->wait(2)
              ->assertPathIs('/dashboard');
 
         $page->navigate('/visitados/listado')
@@ -49,9 +50,10 @@ describe('Planeados Page Browser Tests', function () {
 
         $page = $this->visit('/login');
 
-        $page->type('email', 'planeados@example.com')
-             ->type('password', 'password123')
-             ->click('Log in')
+        $page->type('input[name="email"]', 'planeados@example.com')
+             ->type('input[name="password"]', 'password123')
+             ->submit()
+             ->wait(2)
              ->assertPathIs('/dashboard');
 
         $page->navigate('/planeados/listado')
@@ -74,9 +76,10 @@ describe('Clasificados Page Browser Tests', function () {
 
         $page = $this->visit('/login');
 
-        $page->type('email', 'clasificados@example.com')
-             ->type('password', 'password123')
-             ->click('Log in')
+        $page->type('input[name="email"]', 'clasificados@example.com')
+             ->type('input[name="password"]', 'password123')
+             ->submit()
+             ->wait(2)
              ->assertPathIs('/dashboard');
 
         $page->navigate('/clasificados/listado')
