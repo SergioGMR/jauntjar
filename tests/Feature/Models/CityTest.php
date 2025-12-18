@@ -5,9 +5,6 @@ use App\Models\City;
 use App\Models\Classification;
 use App\Models\Country;
 use App\Models\Destination;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 it('belongs to a country', function () {
     $country = Country::factory()->create();

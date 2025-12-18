@@ -2,11 +2,8 @@
 
 use App\Livewire\Actions\Logout;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
-
-uses(RefreshDatabase::class);
 
 it('can log out a user', function () {
     $user = User::factory()->create();

@@ -3,9 +3,6 @@
 use App\Models\Budget;
 use App\Models\BudgetSegment;
 use App\Models\City;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 it('belongs to a budget', function () {
     $budget = Budget::factory()->create();

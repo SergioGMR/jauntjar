@@ -4,10 +4,7 @@ use App\Livewire\ClasificadosListado;
 use App\Models\City;
 use App\Models\Classification;
 use App\Models\Country;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
-
-uses(RefreshDatabase::class);
 
 it('can render component', function () {
     Livewire::test(ClasificadosListado::class)

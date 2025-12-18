@@ -2,9 +2,6 @@
 
 use App\Models\City;
 use App\Models\Classification;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 it('belongs to a city', function () {
     $city = City::factory()->create();

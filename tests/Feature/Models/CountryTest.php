@@ -2,9 +2,6 @@
 
 use App\Models\City;
 use App\Models\Country;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 it('has many cities', function () {
     $country = Country::factory()->create();

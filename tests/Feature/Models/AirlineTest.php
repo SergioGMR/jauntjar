@@ -2,9 +2,6 @@
 
 use App\Models\Airline;
 use App\Models\Budget;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 it('has many budgets', function () {
     $airline = Airline::factory()->create();

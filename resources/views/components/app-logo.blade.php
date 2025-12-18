@@ -1,8 +1,10 @@
-<div class="flex aspect-square size-8 items-center justify-center rounded-md bg-accent-content text-accent-foreground">
-    <x-app-logo-icon class="size-5 fill-current text-white dark:text-black" />
-</div>
-<div class="ml-1 grid flex-1 text-left text-sm">
-    <span class="mb-0.5 truncate leading-none font-semibold">
-        {{ config('app.name') }}
-    </span>
-</div>
+<img 
+    src="{{ secure_asset('images/logos/light-navbarlogo.webp') }}" 
+    alt="{{ config('app.name') }}" 
+    class="h-8 w-auto hidden dark:block"
+>
+<img 
+    src="{{ secure_asset('images/logos/dark-navbarlogo.webp') }}" 
+    alt="{{ config('app.name') }}" 
+    class="h-8 w-auto block dark:hidden"
+>

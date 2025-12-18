@@ -21,6 +21,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\Support\Enums\Width;
+use Filament\Actions\Action;
 
 class BackofficePanelProvider extends PanelProvider
 {
@@ -35,6 +36,12 @@ class BackofficePanelProvider extends PanelProvider
             ->login()
             ->colors([
                 'primary' => Color::Amber,
+            ])
+            ->userMenuItems([
+                Action::make('dashboard')
+                    ->label(__('Dashboard'))
+                    ->url('/dashboard')
+                    ->icon('heroicon-o-home'),
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
