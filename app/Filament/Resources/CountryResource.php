@@ -2,31 +2,28 @@
 
 namespace App\Filament\Resources;
 
+use BackedEnum;
+use App\Models\Country;
+use Filament\Tables\Table;
+use Illuminate\Support\Str;
 use Filament\Schemas\Schema;
-use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Components\Utilities\Set;
-use Filament\Forms\Components\Select;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\TrashedFilter;
 use Filament\Actions\EditAction;
+use Filament\Resources\Resource;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
 use Filament\Actions\BulkActionGroup;
+use Filament\Forms\Components\Select;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreBulkAction;
-use App\Filament\Resources\CountryResource\Pages\ManageCountries;
-use App\Filament\Resources\CountryResource\Pages;
-use App\Filament\Resources\CountryResource\RelationManagers;
-use App\Models\Country;
-use Filament\Resources\Resource;
-use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Schemas\Components\Utilities\Set;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Str;
+use App\Filament\Resources\CountryResource\Pages\ManageCountries;
 
 class CountryResource extends Resource
 {
@@ -36,9 +33,9 @@ class CountryResource extends Resource
 
     protected static ?string $pluralModelLabel = 'países';
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-flag';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-flag';
 
-    protected static string | \BackedEnum | null $activeNavigationIcon = 'heroicon-s-flag';
+    protected static string|BackedEnum|null $activeNavigationIcon = 'heroicon-s-flag';
 
     protected static ?string $navigationLabel = 'Países';
 
@@ -47,7 +44,7 @@ class CountryResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->components([
+            ->schema([
                 TextInput::make('uuid')
                     ->label('UUID')
                     ->required()
@@ -56,7 +53,7 @@ class CountryResource extends Resource
                 TextInput::make('name')
                     ->label('Nombre')
                     ->live(onBlur: true)
-                    ->afterStateUpdated(function (Set $set, ?string $state) {
+                    ->afterStateUpdated(function (Set $set, ?string $state): void {
                         $set('uuid', (string) Str::uuid());
                         $set('display', Str::title($state));
                         $set('slug', Str::slug($state));
@@ -170,6 +167,7 @@ class CountryResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                TrashedFilter::make(),
                 TrashedFilter::make(),
             ])
             ->recordActions([

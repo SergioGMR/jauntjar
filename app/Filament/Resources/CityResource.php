@@ -2,34 +2,35 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
-use Filament\Schemas\Components\Utilities\Set;
-use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Components\Grid;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Filters\TrashedFilter;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\ForceDeleteAction;
-use Filament\Actions\RestoreAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\ForceDeleteBulkAction;
-use Filament\Actions\RestoreBulkAction;
-use App\Filament\Resources\CityResource\Pages\ManageCities;
-use App\Filament\Resources\CityResource\Pages;
+use BackedEnum;
 use App\Models\City;
 use App\Models\Country;
-use Filament\Forms;
-use Filament\Resources\Resource;
-use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
+use Filament\Schemas\Schema;
+use Filament\Tables\Actions;
+use Filament\Actions\EditAction;
+use Filament\Resources\Resource;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Grid;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Actions\ForceDeleteBulkAction;
+use App\Filament\Resources\CityResource\Pages;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\CityResource\Pages\ManageCities;
 
 class CityResource extends Resource
 {
@@ -39,9 +40,9 @@ class CityResource extends Resource
 
     protected static ?string $pluralModelLabel = 'ciudades';
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-building-library';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-building-library';
 
-    protected static string | \BackedEnum | null $activeNavigationIcon = 'heroicon-s-building-library';
+    protected static string|BackedEnum|null $activeNavigationIcon = 'heroicon-s-building-library';
 
     protected static ?string $navigationLabel = 'Ciudades';
 
@@ -50,7 +51,7 @@ class CityResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->components([
+            ->schema([
                 TextInput::make('uuid')
                     ->label('UUID')
                     ->required()
@@ -60,16 +61,16 @@ class CityResource extends Resource
                     ->label('País')
                     ->searchable()
                     ->relationship('country', 'display')
-                    ->options(fn () => Country::pluck('display', 'id'))
+                    ->options(fn (): array => Country::pluck('display', 'id')->all())
                     ->live()
-                    ->afterStateUpdated(function (Set $set) {
+                    ->afterStateUpdated(function (Set $set): void {
                         $set('uuid', (string) Str::uuid());
                     })
                     ->required(),
                 TextInput::make('name')
                     ->label('Nombre')
                     ->live(onBlur: true)
-                    ->afterStateUpdated(function (Set $set, ?string $state) {
+                    ->afterStateUpdated(function (Set $set, ?string $state): void {
                         $set('uuid', (string) Str::uuid());
                         $set('display', Str::title($state));
                         $set('slug', Str::slug($state));
@@ -91,7 +92,7 @@ class CityResource extends Resource
                             ->label('Latitud')
                             ->numeric()
                             ->step(0.000001)
-                            ->afterStateUpdated(function (Set $set, $state, callable $get) {
+                            ->afterStateUpdated(function (Set $set, Get $get, ?float $state): void {
                                 $set('coordinates', [
                                     'lat' => $state,
                                     'lng' => $get('coordinates.lng'),
@@ -101,7 +102,7 @@ class CityResource extends Resource
                             ->label('Longitud')
                             ->numeric()
                             ->step(0.000001)
-                            ->afterStateUpdated(function (Set $set, $state, callable $get) {
+                            ->afterStateUpdated(function (Set $set, Get $get, ?float $state): void {
                                 $set('coordinates', [
                                     'lat' => $get('coordinates.lat'),
                                     'lng' => $state,
@@ -154,6 +155,7 @@ class CityResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                TrashedFilter::make(),
                 TrashedFilter::make(),
             ])
             ->recordActions([

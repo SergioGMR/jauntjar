@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use BackedEnum;
 use App\Models\Airline;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
@@ -10,6 +11,7 @@ use Filament\Actions\EditAction;
 use Filament\Resources\Resource;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\RestoreAction;
+use Filament\Support\Icons\Heroicon;
 use Filament\Actions\BulkActionGroup;
 use Filament\Forms\Components\Toggle;
 use Filament\Actions\DeleteBulkAction;
@@ -23,6 +25,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Schemas\Components\Utilities\Set;
+use App\Filament\Resources\AirlineResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\AirlineResource\Pages\ManageAirlines;
 
@@ -30,12 +33,22 @@ class AirlineResource extends Resource
 {
     protected static ?string $model = Airline::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $modelLabel = 'aerolínea';
+
+    protected static ?string $pluralModelLabel = 'aerolíneas';
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPaperAirplane;
+
+    protected static string|BackedEnum|null $activeNavigationIcon = Heroicon::PaperAirplane;
+
+    protected static ?string $navigationLabel = 'Aerolíneas';
+
+    protected static ?int $navigationSort = 4;
 
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->components([
+            ->schema([
                 TextInput::make('uuid')
                     ->label('UUID')
                     ->required()
@@ -44,7 +57,7 @@ class AirlineResource extends Resource
                 TextInput::make('name')
                     ->label('Nombre')
                     ->live(onBlur: true)
-                    ->afterStateUpdated(function (Set $set, ?string $state) {
+                    ->afterStateUpdated(function (Set $set, ?string $state): void {
                         $set('uuid', (string) Str::uuid());
                         $set('display', Str::title($state));
                         $set('slug', Str::slug($state));
@@ -97,12 +110,25 @@ class AirlineResource extends Resource
             ])
             ->filters([
                 TrashedFilter::make(),
+                TrashedFilter::make(),
             ])
             ->recordActions([
-                EditAction::make(),
-                DeleteAction::make(),
-                ForceDeleteAction::make(),
-                RestoreAction::make(),
+                EditAction::make()
+                    ->label('')
+                    ->modalHeading('Editar')
+                    ->modalDescription('Editar la aerolínea'),
+                DeleteAction::make()
+                    ->label('')
+                    ->modalHeading('Eliminar')
+                    ->modalDescription('Eliminar la aerolínea'),
+                ForceDeleteAction::make()
+                    ->label('')
+                    ->modalHeading('Destruir')
+                    ->modalDescription('Destruir la aerolínea'),
+                RestoreAction::make()
+                    ->label('')
+                    ->modalHeading('Recuperar')
+                    ->modalDescription('Recuperar la aerolínea'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

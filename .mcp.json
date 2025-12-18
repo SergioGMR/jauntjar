@@ -1,0 +1,12 @@
+{
+    "mcpServers": {
+        "laravel-boost": {
+            "command": "wsl",
+            "args": [
+                "/home/linuxbrew/.linuxbrew/Cellar/php/8.4.13/bin/php",
+                "/home/sergiogmr/dev/laravel/jauntjar/artisan",
+                "boost:mcp"
+            ]
+        }
+    }
+}

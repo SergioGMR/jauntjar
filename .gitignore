@@ -18,7 +18,10 @@ Homestead.json
 Homestead.yaml
 npm-debug.log
 yarn-error.log
-/artisan
+package-lock.json
+yarn.lock
+bun.lock
+
 /auth.json
 /.fleet
 /.idea
@@ -29,3 +32,5 @@ public/fonts
 public/images
 public/css
 public/js
+coverage-report/*
+tests/Browser/Screenshots

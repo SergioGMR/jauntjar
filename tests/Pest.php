@@ -17,6 +17,24 @@ pest()->extend(Tests\TestCase::class)
 
 /*
 |--------------------------------------------------------------------------
+| Browser Tests
+|--------------------------------------------------------------------------
+|
+| Browser tests use Pest's browser plugin with Playwright for end-to-end testing.
+| These tests run in an actual browser environment.
+|
+*/
+
+pest()->extend(Tests\TestCase::class)
+    ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
+    ->in('Browser');
+
+pest()->browser()
+    ->timeout(10000);
+
+
+/*
+|--------------------------------------------------------------------------
 | Expectations
 |--------------------------------------------------------------------------
 |

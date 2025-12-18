@@ -2,40 +2,50 @@
 
 namespace App\Filament\Resources;
 
+use BackedEnum;
+use App\Models\Insurance;
+use Filament\Tables\Table;
+use Illuminate\Support\Str;
 use Filament\Schemas\Schema;
-use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Components\Utilities\Set;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Actions;
 use Filament\Actions\EditAction;
+use Filament\Resources\Resource;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreBulkAction;
-use App\Filament\Resources\InsuranceResource\Pages\ManageInsurances;
-use App\Filament\Resources\InsuranceResource\Pages;
-use App\Models\Insurance;
-use Filament\Forms;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Schemas\Components\Utilities\Set;
+use App\Filament\Resources\InsuranceResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Str;
+use App\Filament\Resources\InsuranceResource\Pages\ManageInsurances;
 
 class InsuranceResource extends Resource
 {
     protected static ?string $model = Insurance::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $modelLabel = 'seguro';
+
+    protected static ?string $pluralModelLabel = 'seguros';
+
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-shield-check';
+
+    protected static string|BackedEnum|null $activeNavigationIcon = 'heroicon-s-shield-check';
+
+    protected static ?string $navigationLabel = 'Seguros';
+
+    protected static ?int $navigationSort = 5;
 
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->components([
+            ->schema([
                 TextInput::make('uuid')
                     ->label('UUID')
                     ->required()
@@ -44,7 +54,7 @@ class InsuranceResource extends Resource
                 TextInput::make('name')
                     ->label('Nombre')
                     ->live(onBlur: true)
-                    ->afterStateUpdated(function (Set $set, ?string $state) {
+                    ->afterStateUpdated(function (Set $set, ?string $state): void {
                         $set('uuid', (string) Str::uuid());
                         $set('display', Str::title($state));
                         $set('slug', Str::slug($state));
@@ -66,7 +76,8 @@ class InsuranceResource extends Resource
             ->columns([
                 TextColumn::make('uuid')
                     ->label('UUID')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('name')
                     ->searchable(),
                 TextColumn::make('display')
@@ -74,7 +85,8 @@ class InsuranceResource extends Resource
                 TextColumn::make('slug')
                     ->searchable(),
                 TextColumn::make('url')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -90,12 +102,25 @@ class InsuranceResource extends Resource
             ])
             ->filters([
                 TrashedFilter::make(),
+                TrashedFilter::make(),
             ])
             ->recordActions([
-                EditAction::make(),
-                DeleteAction::make(),
-                ForceDeleteAction::make(),
-                RestoreAction::make(),
+                EditAction::make()
+                    ->label('')
+                    ->modalHeading('Editar')
+                    ->modalDescription('Editar el seguro'),
+                DeleteAction::make()
+                    ->label('')
+                    ->modalHeading('Eliminar')
+                    ->modalDescription('Eliminar el seguro'),
+                ForceDeleteAction::make()
+                    ->label('')
+                    ->modalHeading('Destruir')
+                    ->modalDescription('Destruir el seguro'),
+                RestoreAction::make()
+                    ->label('')
+                    ->modalHeading('Recuperar')
+                    ->modalDescription('Recuperar el seguro'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

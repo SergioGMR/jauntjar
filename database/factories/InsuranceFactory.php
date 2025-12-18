@@ -16,8 +16,14 @@ class InsuranceFactory extends Factory
      */
     public function definition(): array
     {
+        $name = fake()->company().' Insurance';
+
         return [
-            //
+            'uuid' => fake()->uuid(),
+            'name' => $name,
+            'display' => $name,
+            'slug' => fake()->slug(),
+            'url' => fake()->url(),
         ];
     }
 }

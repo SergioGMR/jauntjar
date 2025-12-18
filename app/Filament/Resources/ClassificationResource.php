@@ -2,32 +2,29 @@
 
 namespace App\Filament\Resources;
 
+use BackedEnum;
+use Filament\Tables\Table;
 use Filament\Schemas\Schema;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
-use App\Models\City;
-use Filament\Schemas\Components\Utilities\Get;
-use Filament\Schemas\Components\Utilities\Set;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\TrashedFilter;
+use App\Models\Classification;
 use Filament\Actions\EditAction;
+use Filament\Resources\Resource;
+use App\Models\City as CityModel;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
 use Filament\Actions\BulkActionGroup;
+use Filament\Forms\Components\Select;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreBulkAction;
-use App\Filament\Resources\ClassificationResource\Pages\ManageClassification;
-use App\Filament\Resources\ClassificationResource\Pages;
-use App\Filament\Resources\ClassificationResource\RelationManagers;
-use App\Models\Classification;
-use Filament\Resources\Resource;
-use Filament\Tables\Table;
-use Filament\Forms;
-use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\ClassificationResource\Pages\ManageClassification;
 
 class ClassificationResource extends Resource
 {
@@ -37,9 +34,9 @@ class ClassificationResource extends Resource
 
     protected static ?string $pluralModelLabel = 'clasificaciones';
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-trophy';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-trophy';
 
-    protected static string | \BackedEnum | null $activeNavigationIcon = 'heroicon-s-trophy';
+    protected static string|BackedEnum|null $activeNavigationIcon = 'heroicon-s-trophy';
 
     protected static ?string $navigationLabel = 'Clasificaciones';
 
@@ -48,51 +45,49 @@ class ClassificationResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema
-            ->components([
+            ->schema([
                 TextInput::make('uuid')
                     ->label('UUID')
                     ->required(),
                 Select::make('city_id')
-                    ->options(fn() => City::where('visited', true)->pluck('display', 'id'))
+                    ->relationship('city', 'display')
+                    ->options(fn (): array => CityModel::where('visited', true)->pluck('display', 'id')->all())
+                    ->searchable()
                     ->required(),
                 TextInput::make('cost')
                     ->required()
                     ->live(onBlur: true)
-                    ->afterStateUpdated(function (Get $get, Set $set, ?int $old, ?int $state) {
+                    ->afterStateUpdated(function (Get $get, Set $set): void {
                         $total = $get('cost') + $get('culture') + $get('weather') + $get('food');
-                        $total = $total / 4;
 
-                        $set('total', $total);
+                        $set('total', $total / 4);
                     })
                     ->numeric(),
                 TextInput::make('culture')
                     ->required()
                     ->live(onBlur: true)
-                    ->afterStateUpdated(function (Get $get, Set $set, ?int $old, ?int $state) {
+                    ->afterStateUpdated(function (Get $get, Set $set): void {
                         $total = $get('cost') + $get('culture') + $get('weather') + $get('food');
-                        $total = $total / 4;
 
-                        $set('total', $total);
+                        $set('total', $total / 4);
                     })
                     ->numeric(),
                 TextInput::make('weather')
                     ->required()
                     ->live(onBlur: true)
-                    ->afterStateUpdated(function (Get $get, Set $set, ?int $old, ?int $state) {
+                    ->afterStateUpdated(function (Get $get, Set $set): void {
                         $total = $get('cost') + $get('culture') + $get('weather') + $get('food');
-                        $total = $total / 4;
 
-                        $set('total', $total);
+                        $set('total', $total / 4);
                     })
                     ->numeric(),
                 TextInput::make('food')
                     ->required()
                     ->live(onBlur: true)
-                    ->afterStateUpdated(function (Get $get, Set $set, ?int $old, ?int $state) {
+                    ->afterStateUpdated(function (Get $get, Set $set): void {
                         $total = $get('cost') + $get('culture') + $get('weather') + $get('food');
-                        $total = $total / 4;
 
-                        $set('total', $total);
+                        $set('total', $total / 4);
                     })
                     ->numeric(),
                 TextInput::make('total')
@@ -140,6 +135,7 @@ class ClassificationResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                TrashedFilter::make(),
                 TrashedFilter::make(),
             ])
             ->recordActions([
