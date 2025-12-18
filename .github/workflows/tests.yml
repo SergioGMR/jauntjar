@@ -28,11 +28,8 @@ jobs:
           extensions: pdo_sqlite, sqlite3, mbstring, xml, curl, zip
           coverage: xdebug
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm'
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
 
       - name: Get Composer Cache Directory
         id: composer-cache
@@ -46,7 +43,7 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
 
       - name: Install Node Dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile
 
       - name: Add Flux Credentials Loaded From ENV
         run: composer config http-basic.composer.fluxui.dev "${{ secrets.FLUX_USERNAME }}" "${{ secrets.FLUX_LICENSE_KEY }}"
@@ -64,7 +61,7 @@ jobs:
         run: touch database/database.sqlite
 
       - name: Build Assets
-        run: npm run build
+        run: bun run build
 
       - name: Run Unit & Feature Tests
         run: ./vendor/bin/pest --testsuite=Unit,Feature --parallel
@@ -95,11 +92,8 @@ jobs:
           tools: composer:v2
           extensions: pdo_sqlite, sqlite3, mbstring, xml, curl, zip
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm'
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
 
       - name: Get Composer Cache Directory
         id: composer-cache
@@ -113,10 +107,10 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
 
       - name: Install Node Dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile
 
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps chromium
+        run: bunx playwright install --with-deps chromium
 
       - name: Add Flux Credentials Loaded From ENV
         run: composer config http-basic.composer.fluxui.dev "${{ secrets.FLUX_USERNAME }}" "${{ secrets.FLUX_LICENSE_KEY }}"
@@ -134,7 +128,7 @@ jobs:
         run: touch database/database.sqlite
 
       - name: Build Assets
-        run: npm run build
+        run: bun run build
 
       - name: Run Browser Tests
         run: ./vendor/bin/pest --testsuite=Browser
