@@ -2,9 +2,6 @@
 
 use App\Models\Budget;
 use App\Models\Insurance;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 it('has many budgets', function () {
     $insurance = Insurance::factory()->create();

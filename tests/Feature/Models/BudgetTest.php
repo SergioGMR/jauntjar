@@ -5,9 +5,6 @@ use App\Models\Budget;
 use App\Models\BudgetSegment;
 use App\Models\City;
 use App\Models\Insurance;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 it('belongs to airline and insurance', function () {
     $airline = Airline::factory()->create();

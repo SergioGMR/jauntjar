@@ -3,10 +3,7 @@
 use App\Livewire\PlaneadosListado;
 use App\Models\City;
 use App\Models\Country;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
-
-uses(RefreshDatabase::class);
 
 it('can render component', function () {
     Livewire::test(PlaneadosListado::class)
