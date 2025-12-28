@@ -2,11 +2,13 @@
 
 namespace App\Providers;
 
+use App\Models\User;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\URL;
-use Filament\Forms\Components\FileUpload;
 use Filament\Tables\Columns\ImageColumn;
+use Filament\Forms\Components\FileUpload;
 use Filament\Infolists\Components\ImageEntry;
 
 class AppServiceProvider extends ServiceProvider
@@ -27,6 +29,13 @@ class AppServiceProvider extends ServiceProvider
         if ($this->app->environment('production')) {
             URL::forceScheme('https');
         }
+
+        Gate::define('viewPulse', function (User $user) {
+           return in_array($user->email, [
+                'sergiogmr@icloud.com'
+            ]);
+        });
+
         Model::automaticallyEagerLoadRelationships();
 
         FileUpload::configureUsing(fn(FileUpload $fileUpload) => $fileUpload
