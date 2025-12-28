@@ -23,6 +23,7 @@ class City extends Model
         'slug',
         'stops',
         'visited',
+        'visited_at',
         'coordinates',
     ];
 
@@ -31,6 +32,9 @@ class City extends Model
         return [
             'visited' => 'boolean',
             'coordinates' => 'array',
+            'visited_at' => 'datetime',
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
         ];
     }
 

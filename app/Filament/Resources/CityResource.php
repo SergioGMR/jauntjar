@@ -14,6 +14,7 @@ use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreAction;
 use Filament\Actions\RestoreBulkAction;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -146,7 +147,12 @@ class CityResource extends Resource
                 TextInput::make('slug')
                     ->required(),
                 Toggle::make('visited')
+                    ->live()
                     ->label('Visitado'),
+                DatePicker::make('visited_at')
+                    ->label('Fecha de visita')
+                    ->live()
+                    ->visible(fn (Get $get): bool => $get('visited') === true),
                 TextInput::make('stops')
                     ->label('Escalas')
                     ->numeric(),
