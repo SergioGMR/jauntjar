@@ -25,6 +25,7 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\ClassificationResource\Pages\ManageClassification;
+use Illuminate\Support\Str;
 
 class ClassificationResource extends Resource
 {
@@ -46,14 +47,19 @@ class ClassificationResource extends Resource
     {
         return $schema
             ->schema([
-                TextInput::make('uuid')
+                 TextInput::make('uuid')
                     ->label('UUID')
-                    ->required(),
+                    ->required()
+                    ->disabled()
+                    ->dehydrated(true),
                 Select::make('city_id')
                     ->relationship('city', 'display')
                     ->options(fn (): array => CityModel::where('visited', true)->pluck('display', 'id')->all())
                     ->searchable()
-                    ->required(),
+                    ->required()
+                    ->afterStateUpdated(function (Set $set, ?string $state): void {
+                        $set('uuid', (string) Str::uuid()); 
+                    }),
                 TextInput::make('cost')
                     ->required()
                     ->live(onBlur: true)
