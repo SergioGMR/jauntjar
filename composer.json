@@ -13,6 +13,8 @@
         "filament/filament": "^4.3.1",
         "filament/upgrade": "^4.3.1",
         "laravel/framework": "^12.43.1",
+        "laravel/pulse": "^1.4",
+        "laravel/telescope": "^5.16",
         "laravel/tinker": "^2.10.2",
         "larswiegers/laravel-maps": "^0.19",
         "livewire/flux": "^2.10.1",
@@ -61,7 +63,7 @@
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
-            "bunx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"bun run dev\" --names=server,vite"
+            "bunx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"php artisan pail --timeout=0\" \"php artisan pulse:work\" \"bun run dev\" --names=server,vite"
         ]
     },
     "extra": {
