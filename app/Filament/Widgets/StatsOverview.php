@@ -33,13 +33,13 @@ class StatsOverview extends BaseWidget
                 ->color('primary'),
 
             Stat::make('Ciudades', $totalCities)
-                ->description($visitedCities . ' visitadas (' . $visitedPercentage . '%)')
+                ->description($visitedCities.' visitadas ('.$visitedPercentage.'%)')
                 ->descriptionIcon('heroicon-m-map-pin')
                 ->chart($this->getCitiesChartData())
                 ->color('success'),
 
             Stat::make('Viajes', $totalBudgets)
-                ->description(number_format($totalSpent, 2, ',', '.') . ' € gastados')
+                ->description(number_format($totalSpent, 2, ',', '.').' € gastados')
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('warning'),
 
@@ -53,6 +53,7 @@ class StatsOverview extends BaseWidget
     protected function getCitiesChartData(): array
     {
         return City::selectRaw('strftime("%Y-%m", created_at) as month, COUNT(*) as count')
+            ->whereNotNull('created_at')
             ->groupBy('month')
             ->orderBy('month')
             ->limit(6)

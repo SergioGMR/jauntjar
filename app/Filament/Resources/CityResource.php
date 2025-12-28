@@ -2,35 +2,34 @@
 
 namespace App\Filament\Resources;
 
-use BackedEnum;
+use App\Filament\Resources\CityResource\Pages\ManageCities;
 use App\Models\City;
 use App\Models\Country;
-use Filament\Tables\Table;
-use Illuminate\Support\Str;
-use Filament\Schemas\Schema;
-use Filament\Tables\Actions;
-use Filament\Actions\EditAction;
-use Filament\Resources\Resource;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\RestoreAction;
+use BackedEnum;
 use Filament\Actions\BulkActionGroup;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Components\Grid;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteAction;
-use Filament\Actions\RestoreBulkAction;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Forms\Components\TextInput;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Tables\Filters\TrashedFilter;
 use Filament\Actions\ForceDeleteBulkAction;
-use App\Filament\Resources\CityResource\Pages;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\CityResource\Pages\ManageCities;
+use Illuminate\Support\Str;
 
 class CityResource extends Resource
 {
@@ -62,6 +61,72 @@ class CityResource extends Resource
                     ->searchable()
                     ->relationship('country', 'display')
                     ->options(fn (): array => Country::pluck('display', 'id')->all())
+                    ->createOptionForm([
+                       Grid::make()
+                       ->schema([
+                         TextInput::make('uuid')
+                            ->label('UUID')
+                            ->required()
+                            ->disabled()
+                            ->dehydrated(true),
+                        TextInput::make('name')
+                            ->label('Nombre')
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(function (Set $set, ?string $state): void {
+                                $set('uuid', (string) Str::uuid());
+                                $set('display', Str::title($state));
+                                $set('slug', Str::slug($state));
+                            })
+                            ->required(),
+                        TextInput::make('display')
+                            ->required(),
+                        TextInput::make('slug')
+                            ->disabled()
+                            ->dehydrated(true)
+                            ->required(),
+                        TextInput::make('code')
+                            ->label('Código')
+                            ->required(),
+                        TextInput::make('currency')
+                            ->label('Moneda')
+                            ->required(),
+                        TextInput::make('pibpc')
+                            ->label('PIB per capita')
+                            ->required()
+                            ->integer(),
+                        TextInput::make('womens_rights')
+                            ->label('Derechos de las mujeres')
+                            ->required()
+                            ->numeric()
+                            ->default(0)
+                            ->minValue(0)
+                            ->maxValue(10),
+                        TextInput::make('lgtb_rights')
+                            ->label('Derechos de LGTBIQ+')
+                            ->required()
+                            ->numeric()
+                            ->default(0)
+                            ->minValue(0)
+                            ->maxValue(10),
+                        Select::make('visa')
+                            ->options([
+                                'No' => 'No',
+                                'Sí' => 'Sí',
+                            ])
+                            ->required(),
+                        TextInput::make('language')
+                            ->label('Idioma')
+                            ->required(),
+                        Select::make('roaming')
+                            ->options([
+                                'N/A' => 'N/A',
+                                '1' => 'Zona 1',
+                                '2' => 'Zona 2',
+                                '3' => 'Zona 3',
+                            ])
+                            ->required(),
+                       ])->columns(2)
+                    ])
                     ->live()
                     ->afterStateUpdated(function (Set $set): void {
                         $set('uuid', (string) Str::uuid());
@@ -82,7 +147,12 @@ class CityResource extends Resource
                 TextInput::make('slug')
                     ->required(),
                 Toggle::make('visited')
+                    ->live()
                     ->label('Visitado'),
+                DatePicker::make('visited_at')
+                    ->label('Fecha de visita')
+                    ->live()
+                    ->visible(fn (Get $get): bool => $get('visited') === true),
                 TextInput::make('stops')
                     ->label('Escalas')
                     ->numeric(),
